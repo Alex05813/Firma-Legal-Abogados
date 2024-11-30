@@ -1,20 +1,32 @@
-import React from 'react';
-import './App.css';
-import UsersList from './components/UsersList';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UsersList from './pages/UserPage.jsx';
+import ProcessList from './pages/ProcessPage.jsx';
+import ClientList from './pages/ClientPage.jsx';
+import FacturasList from './pages/FacturaPage.jsx';
+import AgendaList from './pages/AgendaPage.jsx';
+import Homepage from "./pages/Homepage.jsx";
+import Resumen from "./pages/AbogadoPage.jsx";
+import Navbar from './components/Navbar.jsx'; // Importar el Navbar
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>L&O Firma Legal Abogados</h1>
-        <p>Gestiona el listado de los usuarios</p>
-      </header>
-      
-      <div className="users-list-container">
-        <UsersList />
-      </div>
-    </div>
+    <Router>
+      {/* Colocar Navbar fuera de las rutas, para que siempre esté visible */}
+    
+
+      {/* Definir las rutas de la aplicación */}
+      <Routes>
+        <Route path="/" element={<Homepage />} /> {/* Página de inicio */}
+        <Route path="/proceso" element={<ProcessList />} />
+        <Route path="/users" element={<UsersList />} />
+        <Route path="/clientes" element={<ClientList />} />
+        <Route path="/agenda" element={<AgendaList />} />
+        <Route path="/facturas" element={<FacturasList />} />
+        <Route path="/resumen" element={<Resumen />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
