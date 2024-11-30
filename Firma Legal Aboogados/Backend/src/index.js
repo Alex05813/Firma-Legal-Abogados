@@ -12,6 +12,12 @@ import AsistenteRouter from './routes/AsistenteRoutes.js';
 import ClienteRouter from './routes/ClienteRoutes.js';
 import ProcessRouter from './routes/ProcessRoutes.js';
 import tipoProcessRouter from './routes/TipoProcessRoutes.js';
+import subprocesoRouter from './routes/SubProcessRoutes.js';
+import DocEspRouter from './routes/DocEspRoutes.js';
+import facturaRouter from './routes/FacturaRoutes.js';
+import agendaRouter from './routes/AgendaRoutes.js';
+import procesoAbogadoRouter from './routes/ProcessAbogadoRoutes.js';
+import AutenticationRouter from './routes/AutenticationRoutes.js';
 
 const app = express(); 
 
@@ -30,6 +36,12 @@ app.use('/api/asistentes', AsistenteRouter);
 app.use('/api/clientes', ClienteRouter);
 app.use('/api/procesos', ProcessRouter);
 app.use('/api/tipoprocesos', tipoProcessRouter);
+app.use('/api/subprocesos', subprocesoRouter);
+app.use('/api/docesp', DocEspRouter);
+app.use('/api/facturas', facturaRouter);
+app.use('/api/agendas', agendaRouter);
+app.use('/api/procesoabogados', procesoAbogadoRouter);
+app.use('/api/autenticacion', AutenticationRouter);
 
 // Usamos el metodo para conectarnos a la BdD de mongoose
 const clientOptions = {
