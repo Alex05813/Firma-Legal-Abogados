@@ -18,64 +18,23 @@ const options = {
     servers: [
       {
         url: 'http://localhost:9000',
-        description: 'Documentación de mi API Rest',
+        description: 'Local Server',
       },
     ],
     components: {
-      schemas: {
-        // Esquema para Usuario
-        Usuario: {
-          type: 'object',
-          properties: {
-            username: { type: 'string', description: 'Nombre de usuario' },
-            email: { type: 'string', description: 'Correo electrónico del usuario' },
-            password: { type: 'string', description: 'Contraseña del usuario' },
-          },
-          required: ['username', 'email', 'password'],
-        },
-
-        // Esquema para Abogado
-        Abogado: {
-          type: 'object',
-          properties: {
-            nombre: { type: 'string', description: 'Nombre del abogado' },
-            apellido: { type: 'string', description: 'Apellido del abogado' },
-            email: { type: 'string', description: 'Correo electrónico del abogado' },
-            telefono: { type: 'string', description: 'Teléfono del abogado' },
-          },
-          required: ['nombre', 'apellido', 'email'],
-        },
-
-        // Esquema para Proceso
-        Proceso: {
-          type: 'object',
-          properties: {
-            id_proceso: { type: 'number', description: 'Número único que identifica el proceso' },
-            descripcion: { type: 'string', description: 'Descripción detallada del proceso' },
-            fecha_inicio: { type: 'string', format: 'date-time', description: 'Fecha de inicio del proceso (ISO 8601)' },
-            estado: {
-              type: 'string',
-              enum: ['activo', 'inactivo'],
-              description: 'Estado actual del proceso (activo/inactivo)',
-            },
-            numeroIdentificacionCliente: { type: 'string', description: 'Número de identificación del cliente asociado al proceso' },
-            numeroIdentificacionAbogado: { type: 'string', description: 'Número de identificación del abogado asignado al proceso' },
-            id_tipo: { type: 'number', description: 'Tipo de proceso (por ejemplo: penal, civil, laboral)' },
-          },
-          required: ['id_proceso', 'descripcion', 'fecha_inicio', 'estado', 'numeroIdentificacionCliente', 'numeroIdentificacionAbogado', 'id_tipo'],
-        },
-
-        // Esquema para Tipo de Proceso
-        TipoProcess: {
-          type: 'object',
-          properties: {
-            id_tipo: { type: 'number', description: 'Número único que identifica el tipo de proceso' },
-            nombre: { type: 'string', description: 'Nombre del tipo de proceso (por ejemplo: "Notariales", "Juzgados", "Curadurías")' },
-          },
-          required: ['id_tipo', 'nombre'],
-        },
+        securitySchemes: {
+          BearerAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+          }
+        }
       },
-    },
+      security: [
+        {
+          BearerAuth: []
+        }
+      ]
   },
   apis: [
     './src/routes/UsersRoutes.js',
@@ -85,7 +44,14 @@ const options = {
     './src/routes/RoleRoutes.js',
     './src/routes/ProcessRoutes.js',
     './src/routes/TipoprocessRoutes.js',
-  ],
+    './src/routes/SubProcessRoutes.js', 
+    './src/routes/DocEspRoutes.js', 
+    './src/routes/FacturaRoutes.js', 
+    './src/routes/AgendaRoutes.js',
+    './src/routes/ProcessAbogadoRoutes.js',
+    './src/routes/AutenticationRoutes.js'
+  ]
+  
 };
 
 const swaggerSpec = swaggerJSDoc(options);
