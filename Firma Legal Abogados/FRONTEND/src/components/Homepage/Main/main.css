@@ -1,0 +1,260 @@
+.swiper {
+    width: 100%;
+    padding: 50px 0 50px 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
+  
+  .swiper-slide {
+    width: 400px;
+    height: 450px;
+    background-color: #f7f7f7;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+  }
+
+.icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .icons i {
+    font-size: 20px;
+    color: #6b89b3;
+  }
+  
+  .icons img {
+    width: 80px;
+  }
+  
+  .proceso-content {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .proceso-txt {
+    flex-basis: 50%;
+    text-align: left;
+  }
+  
+  .proceso-txt h3 {
+    font-size: 20px;
+    color: #000;
+    text-transform: uppercase;
+  }
+  
+  .proceso-txt p {
+    font-size: 14px;
+    color: #5c5b5b;
+    text-align: justify;
+  }
+  
+  .proceso-img {
+    flex-basis: 50%;
+    text-align: right;
+  }
+  
+  .proceso-img img {
+    width: 120px;
+  }
+  
+  .btn-1 {
+    display: inline-block;
+    padding: 13px 55px;
+    border: 1px solid #6b89b3;
+    border-radius: 25px;
+    color: #6b89b3;
+    text-decoration: none;
+    margin-top: 20px;
+  }
+  
+  .btn-1:hover {
+    background-color: #6b89b3;
+    color: #ffffff;
+  }
+  
+  
+  .noticias-container {
+    background-color: #f7f7f7;
+    padding: 50px 0;
+    text-align: center;
+  }
+  
+  .titulo-seccion {
+    text-align: center;
+    font-family: helvetica Neue, helvetica;
+    color: #5c5b5b;
+    letter-spacing: 35px;
+    font-size: 20px;
+  }
+  
+  .tarjeta-noticia {
+    display: flex;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 1000px;
+    transition: transform 0.3s ease;
+  }
+  
+  .tarjeta-noticia:hover {
+    transform: scale(1.02);
+  }
+  
+  .imagen-noticia {
+    width: 40%;
+    object-fit: cover;
+    height: 100%;
+  }
+  
+  .contenido-noticia {
+    font-family: helvetica Neue, helvetica;
+    padding: 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+  }
+  
+  .titulo-noticia {
+    font-family: helvetica Neue, helvetica;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+    font-family: 'Georgia', serif;
+  }
+  
+  .descripcion-noticia {
+    font-size: 16px;
+    color: #777;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .boton-leer-mas {
+   display: inline-block;
+   text-align: center;
+   padding: 13px 55px;
+   border: 1px solid #6b89b3;
+   border-radius: 20px;
+   color: #6b89b3;
+   text-decoration: none;
+  }
+  
+  .boton-leer-mas:hover {
+    border: 1px solid #6b89b3;
+    background-color: #6b89b3;
+    color: #fff;
+  
+  }
+  
+  
+  @media (max-width: 768px) {
+    .tarjeta-noticia {
+        flex-direction: column;
+        max-width: 90%;
+    }
+  
+    .imagen-noticia {
+        width: 100%;
+        height: 200px;
+    }
+  
+    .contenido-noticia {
+        width: 100%;
+    }
+  }
+  
+  .nuestro-equipo {
+    text-align: center;
+    font-family: helvetica Neue, helvetica;
+    font-size: 10px;
+    color: #5c5b5b;
+    letter-spacing: 35px;
+  }
+  
+  .nuestro-equipo h1{
+    font-size: 20px;
+  }
+  
+  .abogados {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .abogado-box {
+    grid-column: 1fr;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: justify;
+    width: 300px;
+    max-height: 100%; 
+    overflow-y: auto; 
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-top: 20px;
+  }
+  
+  .abogado-box:hover {
+    transform: scale(1.05);
+  }
+  
+  .abogado-box img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  .nombre-abogado {
+    text-align: center;
+  }
+  
+  .abogado-box h3 {
+    margin: 10px 0;
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .abogado-box p {
+    margin: 5px 0;
+    color: #777;
+  }
+  
+  .casos {
+    display: none; /* Ocultamos la lista de casos por defecto */
+    margin-top: 15px;
+    text-align: left;
+  }
+  
+  .ver-mas {
+    padding-top: 20px;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+  
+  .ver-mas a {
+    font-family: helvetica Neue, helvetica;
+    font-size: 20px;
+    color: #777;
+    text-decoration: underline;
+    text-decoration-color: #6b89b3;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 4px;
+  }
+  
+  .card-group {
+    margin-bottom: 20PX;
+  }
