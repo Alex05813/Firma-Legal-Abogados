@@ -1,0 +1,81 @@
+import Joi from "joi";
+
+//Esquema de validacion para crear una factura
+export const createAgendaSchema = Joi.object({
+    id_agenda: Joi.number().required().messages({
+        'any.required': 'El ID de la agenda es obligatorio.',
+        'number.base': 'El ID de la agenda debe ser un número.',
+    }),
+
+    fecha: Joi.date().required().messages({
+        'any.required': 'La fecha es obligatoria.',
+        'date.base': 'La fecha debe ser una fecha válida.',
+    }),
+
+    hora: Joi.date().required().messages({
+        'any.required': 'La hora es obligatoria.',
+        'date.base': 'La hora debe ser válida.',
+    }),
+
+    descripcion: Joi.string().min(3).required().messages({
+        'string.min': 'La descripción debe tener al menos 3 caracteres.',
+        'any.required': 'La descripción es obligatoria.'
+    }),
+
+    estado: Joi.string().valid('programada', 'cancelada').required().messages({
+        'any.required': 'El estado es obligatorio.',
+        'any.only': 'El estado debe ser "programada" o "cancelada".',
+    }),
+
+    id_proceso: Joi.number().required().messages({
+        'any.required': 'El id del proceso es obligatorio.',
+        'number.base': 'El id del proceso debe ser un número válido.',
+      }),
+
+});
+
+//Esquema de validacion para editar una factura
+export const updateAgendaSchema = Joi.object({
+    fecha: Joi.date().optional().messages({
+        'date.base': 'La fecha debe ser una fecha válida.',
+    }),
+
+    hora: Joi.date().optional().messages({
+        'date.base': 'La hora debe ser válida.',
+    }),
+
+    descripcion: Joi.string().optional().messages({
+        'any.required': 'La descripcion de la agenda es obligatoria.',
+    }),
+
+    estado: Joi.string().valid('programada', 'cancelada').optional().messages({
+        'any.only': 'El estado debe ser "programada" o "cancelada".',
+      }),
+
+})
+
+// Esquema de validación para obtener todas las agendas
+export const getAllAgendasSchema = Joi.object({
+    estado: Joi.string().valid('programada', 'cancelada').optional().messages({
+        'any.only': 'El estado debe ser "programada" o "cancelada".',
+    }),
+    id_proceso: Joi.string().optional().messages({
+        'string.base': 'El proceso debe ser una cadena de texto (ObjectId de MongoDB).',
+    }),
+});
+
+// Esquema de validación para obtener una agenda por ID
+export const getAgendaByIdSchema = Joi.object({
+    id_agenda: Joi.number().required().messages({
+        'any.required': 'El ID de la agenda es obligatorio.',
+        'number.base': 'El ID de la agenda debe ser un número.',
+    }),
+}).unknown(true);  // Permite parámetros de ruta (params)
+
+// Esquema de validación para eliminar una agenda
+export const deleteAgendaSchema = Joi.object({
+    id_agenda: Joi.number().required().messages({
+        'any.required': 'El ID de la agenda es obligatorio.',
+        'number.base': 'El ID de la agenda debe ser un número.',
+    }),
+}).unknown(true);  // Permite parámetros de ruta (params)
