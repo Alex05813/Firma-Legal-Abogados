@@ -65,7 +65,7 @@ const Abogadorouter = express.Router();
  *     description: Crea un nuevo abogado y lo asocia a un usuario por su número de identificación.
  *     tags: [Abogados]
  *     security:
- *       - bearerAuth: []  # Especifica que se requiere un token JWT
+ *       - BearerAuth: []  # Especifica que se requiere un token JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -110,11 +110,11 @@ Abogadorouter.get('/:numeroIdentificacion', verifyToken, verifyRole(['asistente'
  * @swagger
  * /api/abogados/{numeroIdentificacion}:
  *   put:
- *     summary: Actualizar un abogado
- *     description: Actualiza los detalles de un abogado. Solo se pueden modificar los campos proporcionados.
+ *     summary: Actualizar los detalles de un abogado
+ *     description: Actualiza los detalles de un abogado utilizando su número de identificación. Los campos que no se incluyan en la solicitud no se modificarán.
  *     tags: [Abogados]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     parameters:
  *       - in: path
  *         name: numeroIdentificacion
@@ -132,9 +132,9 @@ Abogadorouter.get('/:numeroIdentificacion', verifyToken, verifyRole(['asistente'
  *       200:
  *         description: Abogado actualizado exitosamente
  *       400:
- *         description: Error de validación
+ *         description: Error de validación, los datos enviados no son correctos
  *       404:
- *         description: Abogado no encontrado
+ *         description: Abogado no encontrado con el número de identificación proporcionado
  *       500:
  *         description: Error interno en el servidor
  */

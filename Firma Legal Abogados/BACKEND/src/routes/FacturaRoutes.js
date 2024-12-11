@@ -16,6 +16,12 @@ const facturaRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Factura:
  *       type: object
@@ -52,7 +58,7 @@ const facturaRouter = express.Router();
  *     description: Crea una nueva factura asociada a un proceso.
  *     tags: [Factura]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -76,6 +82,8 @@ facturaRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler
  *     summary: Obtener una factura por ID
  *     description: Obtiene los detalles de una factura mediante su ID.
  *     tags: [Factura]
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     parameters:
  *       - in: path
  *         name: id_factura
@@ -100,6 +108,8 @@ facturaRouter.get('/:id_factura', verifyToken, verifyRole(['abogado', 'asistente
  *     summary: Obtener todas las facturas
  *     description: Obtiene todas las facturas registradas con filtros opcionales.
  *     tags: [Factura]
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Facturas encontradas
@@ -115,6 +125,8 @@ facturaRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(
  *     summary: Editar una factura
  *     description: Permite editar los detalles de una factura mediante su ID.
  *     tags: [Factura]
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     parameters:
  *       - in: path
  *         name: id_factura
@@ -145,6 +157,8 @@ facturaRouter.put('/:id_factura', verifyToken, verifyRole(['asistente']), valida
  *     summary: Eliminar una factura por ID
  *     description: Elimina una factura mediante su ID.
  *     tags: [Factura]
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación
  *     parameters:
  *       - in: path
  *         name: id_factura

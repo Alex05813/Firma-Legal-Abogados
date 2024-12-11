@@ -1,8 +1,15 @@
 import express from 'express';
-import { crearSubproceso, obtenerSubprocesos, obtenerSubproceso, eliminarSubproceso } from '../controllers/SubProcessController.js';  
-import { createSubprocesoSchema, getSubprocesoByIdSchema, deleteSubprocesoSchema } from '../validators/SubProcessValidation.js';  
-import { validatorHandler } from '../middleware/validator.handler.js';  
-import { verifyToken, verifyRole } from '../middleware/Autentication.js';  
+import {
+  crearSubproceso,
+  obtenerSubprocesos,
+  obtenerSubproceso,
+  eliminarSubproceso,
+  obtenerSubprocesosPorTipo
+} from '../controllers/SubProcessController.js';
+
+import { createSubprocesoSchema, getSubprocesoByIdSchema, deleteSubprocesoSchema } from '../validators/SubProcessValidation.js';
+import { validatorHandler } from '../middleware/validator.handler.js';
+import { verifyToken, verifyRole } from '../middleware/Autentication.js';
 
 const subProcessRouter = express.Router();
 
@@ -16,6 +23,12 @@ const subProcessRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Subproceso:
  *       type: object
@@ -43,13 +56,13 @@ const subProcessRouter = express.Router();
  *     description: Crea un nuevo subproceso asociando a un tipo de proceso.
  *     tags: [Subprocesos]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Subproceso'  # Referencia al esquema 'Subproceso'
+ *             $ref: '#/components/schemas/Subproceso'
  *     responses:
  *       201:
  *         description: Subproceso creado exitosamente
@@ -58,7 +71,13 @@ const subProcessRouter = express.Router();
  *       500:
  *         description: Error interno en el servidor
  */
-subProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(createSubprocesoSchema, 'body'), crearSubproceso);
+subProcessRouter.post(
+  '/', 
+  verifyToken, 
+  verifyRole(['asistente']), 
+  validatorHandler(createSubprocesoSchema, 'body'),
+  crearSubproceso
+);
 
 /**
  * @swagger
@@ -68,7 +87,7 @@ subProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHand
  *     description: Obtiene una lista de todos los subprocesos.
  *     tags: [Subprocesos]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de subprocesos
@@ -81,7 +100,12 @@ subProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHand
  *       500:
  *         description: Error interno en el servidor
  */
-subProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerSubprocesos);
+subProcessRouter.get(
+  '/', 
+  verifyToken, 
+  verifyRole(['asistente']), 
+  obtenerSubprocesos
+);
 
 /**
  * @swagger
@@ -98,7 +122,7 @@ subProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerSubproc
  *         schema:
  *           type: number
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Subproceso encontrado
@@ -111,7 +135,50 @@ subProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerSubproc
  *       500:
  *         description: Error interno en el servidor
  */
-subProcessRouter.get('/:id_subproceso', verifyToken, verifyRole(['asistente']), validatorHandler(getSubprocesoByIdSchema, 'params'), obtenerSubproceso);
+subProcessRouter.get(
+  '/:id_subproceso', 
+  verifyToken, 
+  verifyRole(['asistente']), 
+  validatorHandler(getSubprocesoByIdSchema, 'params'), 
+  obtenerSubproceso
+);
+
+/**
+ * @swagger
+ * /api/subprocesos/tipo/{id_tipo}:
+ *   get:
+ *     summary: Obtener subprocesos por tipo
+ *     description: Obtiene una lista de subprocesos asociados a un tipo de proceso.
+ *     tags: [Subprocesos]
+ *     parameters:
+ *       - in: path
+ *         name: id_tipo
+ *         required: true
+ *         description: ID del tipo de proceso  
+ *         schema:
+ *           type: number
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Subprocesos encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: 
+ *                 $ref: '#/components/schemas/Subproceso'
+ *       404:
+ *         description: No se encontraron subprocesos para el tipo especificado
+ *       500:
+ *         description: Error interno en el servidor
+ */
+subProcessRouter.get(
+  '/tipo/:id_tipo',
+  verifyToken,
+  verifyRole(['asistente']),
+  obtenerSubprocesosPorTipo
+);
 
 /**
  * @swagger
@@ -124,19 +191,25 @@ subProcessRouter.get('/:id_subproceso', verifyToken, verifyRole(['asistente']), 
  *       - in: path
  *         name: id_subproceso
  *         required: true
- *         description: El ID único del subproceso a eliminar
+ *         description: El ID del subproceso a eliminar
  *         schema:
  *           type: number
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Subproceso eliminado correctamente
  *       404:
  *         description: Subproceso no encontrado
  *       500:
- *         description: Error interno en el servidor
+ *         description: Error interno del servidor
  */
-subProcessRouter.delete('/:id_subproceso', verifyToken, verifyRole(['asistente']), validatorHandler(deleteSubprocesoSchema, 'params'), eliminarSubproceso);
+subProcessRouter.delete(
+  '/:id_subproceso',
+  verifyToken,
+  verifyRole(['asistente']),
+  validatorHandler(deleteSubprocesoSchema, 'params'),
+  eliminarSubproceso
+);
 
 export default subProcessRouter;

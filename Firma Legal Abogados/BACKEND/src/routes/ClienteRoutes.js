@@ -1,6 +1,6 @@
 import express from 'express';
-import { crearCliente, getCliente, updateCliente } from '../controllers/ClienteController.js';
-import { createClienteSchema, updateClienteSchema, getClienteSchema } from '../validators/ClienteValidation.js';
+import { crearCliente, getCliente, updateCliente, getClientes } from '../controllers/ClienteController.js';
+import { createClienteSchema, updateClienteSchema, getClienteSchema, getClientesSchema } from '../validators/ClienteValidation.js';
 import { validatorHandler } from '../middleware/validator.handler.js';
 import { verifyToken, verifyRole } from '../middleware/Autentication.js';  // Importar los middlewares de autenticación
 
@@ -55,7 +55,7 @@ const ClienteRouter = express.Router();
  *     description: Crea un nuevo cliente y lo asocia a un usuario por su número de identificación.
  *     tags: [Clientes]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -80,6 +80,25 @@ ClienteRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler
 
 /**
  * @swagger
+ * /api/clientes:
+ *   get:
+ *     summary: Obtener todos los clientes
+ *     description: Obtiene la lista de todos los clientes registrados en la base de datos.
+ *     tags: [Clientes]
+ *     security:
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *     responses:
+ *       200:
+ *         description: Lista de clientes
+ *       404:
+ *         description: No se encontraron clientes
+ *       500:
+ *         description: Error interno al obtener los clientes
+ */
+ClienteRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(getClientesSchema, 'query'), getClientes); 
+
+/**
+ * @swagger
  * /api/clientes/{numeroIdentificacion}:
  *   get:
  *     summary: Obtener un cliente por número de identificación
@@ -93,7 +112,7 @@ ClienteRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler
  *           type: string
  *         description: Número de identificación del cliente
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Cliente encontrado
@@ -129,7 +148,7 @@ ClienteRouter.get('/:numeroIdentificacion', verifyToken, verifyRole(['asistente'
  *           schema:
  *             $ref: '#/components/schemas/Cliente'
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Cliente actualizado exitosamente
