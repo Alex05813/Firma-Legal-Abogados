@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearProceso, getProceso, getAllProcesos, eliminarProceso } from '../controllers/ProcessController.js';
+import { crearProceso, getProceso, getAllProcesos, eliminarProceso, actualizarProceso } from '../controllers/ProcessController.js';
 import { createProcesoSchema, getAllProcesosSchema, getProcesoByIdSchema, deleteProcesoSchema } from '../validators/ProcessValidation.js';
 import { validatorHandler } from '../middleware/validator.handler.js';
 import { verifyToken, verifyRole } from '../middleware/Autentication.js'; 
@@ -16,6 +16,12 @@ const ProcessRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Proceso:
  *       type: object
@@ -46,7 +52,7 @@ const ProcessRouter = express.Router();
  *     description: Crea un nuevo proceso asociando un cliente y un abogado mediante sus números de identificación.
  *     tags: [Procesos]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -78,6 +84,8 @@ ProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler
  *         description: ID del proceso
  *         schema:
  *           type: number
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Proceso encontrado
@@ -96,6 +104,8 @@ ProcessRouter.get('/:id_proceso', verifyToken, verifyRole(['asistente', 'abogado
  *     summary: Obtener todos los procesos
  *     description: Obtiene todos los procesos registrados.
  *     tags: [Procesos]
+ *     security:
+ *       - BearerAuth: []  # Ruta protegida, requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Procesos encontrados
@@ -103,6 +113,41 @@ ProcessRouter.get('/:id_proceso', verifyToken, verifyRole(['asistente', 'abogado
  *         description: Error interno en el servidor
  */
 ProcessRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(getAllProcesosSchema, 'query'), getAllProcesos);
+
+
+/**
+ * @swagger
+ * /api/procesos/{id_proceso}:
+ *   put:
+ *     summary: Actualizar un proceso por ID
+ *     description: Permite actualizar los detalles de un proceso mediante su ID.
+ *     tags: [Procesos]
+ *     security:
+ *       - BearerAuth: []  # Ruta protegida, requiere autenticación con JWT
+ *     parameters:
+ *       - in: path
+ *         name: id_proceso
+ *         required: true
+ *         description: ID del proceso a actualizar
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Proceso'
+ *     responses:
+ *       200:
+ *         description: Proceso actualizado con éxito
+ *       404:
+ *         description: Proceso no encontrado
+ *       400:
+ *         description: Error de validación o datos incorrectos
+ *       500:
+ *         description: Error interno en el servidor
+ */
+ProcessRouter.put('/:id_proceso', verifyToken, verifyRole(['asistente']), validatorHandler(createProcesoSchema, 'body'), actualizarProceso);
 
 
 /**
@@ -119,6 +164,8 @@ ProcessRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(
  *         description: ID del proceso
  *         schema:
  *           type: number
+ *     security:
+ *       - BearerAuth: []  # Ruta protegida, requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Proceso eliminado con éxito

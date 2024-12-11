@@ -12,9 +12,10 @@ export const createAgendaSchema = Joi.object({
         'date.base': 'La fecha debe ser una fecha válida.',
     }),
 
-    hora: Joi.date().required().messages({
+    hora: Joi.string().pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/).required().messages({
         'any.required': 'La hora es obligatoria.',
-        'date.base': 'La hora debe ser válida.',
+        'string.base': 'La hora debe ser válida.',
+        'string.pattern.base': 'La hora debe tener el formato HH:mm',
     }),
 
     descripcion: Joi.string().min(3).required().messages({
@@ -30,9 +31,10 @@ export const createAgendaSchema = Joi.object({
     id_proceso: Joi.number().required().messages({
         'any.required': 'El id del proceso es obligatorio.',
         'number.base': 'El id del proceso debe ser un número válido.',
-      }),
+    }),
 
 });
+
 
 //Esquema de validacion para editar una factura
 export const updateAgendaSchema = Joi.object({
@@ -40,8 +42,8 @@ export const updateAgendaSchema = Joi.object({
         'date.base': 'La fecha debe ser una fecha válida.',
     }),
 
-    hora: Joi.date().optional().messages({
-        'date.base': 'La hora debe ser válida.',
+    hora: Joi.string().optional().messages({
+        'string.base': 'La hora debe ser válida.',
     }),
 
     descripcion: Joi.string().optional().messages({

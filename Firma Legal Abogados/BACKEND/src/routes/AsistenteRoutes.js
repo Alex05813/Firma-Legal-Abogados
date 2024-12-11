@@ -55,7 +55,7 @@ const AsistenteRouter = express.Router();
  *     description: Crea un nuevo asistente y lo asocia a un usuario por su número de identificación.
  *     tags: [Asistentes]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -93,7 +93,7 @@ AsistenteRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandl
  *           type: string
  *         description: Número de identificación del asistente
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Asistente encontrado
@@ -129,7 +129,7 @@ AsistenteRouter.get('/:numeroIdentificacion', verifyToken, verifyRole(['asistent
  *           schema:
  *             $ref: '#/components/schemas/Asistente'
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Asistente actualizado exitosamente

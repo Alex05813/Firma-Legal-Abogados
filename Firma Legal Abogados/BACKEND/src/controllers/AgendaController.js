@@ -114,8 +114,9 @@ export const getAllAgendas = async (req, res) => {
         // Buscar todas las agendas con los filtros
         const agendas = await Agenda.find(query);
 
+        // Si no se encuentran agendas, devolver un array vacío con status 200
         if (agendas.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron agendas' });
+            return res.status(200).json([]); // Cambié el 404 por 200 y devuelvo un array vacío
         }
 
         // Devolver las agendas encontradas

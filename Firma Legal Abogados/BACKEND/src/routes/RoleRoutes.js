@@ -16,6 +16,12 @@ const roleRoutes = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Role:
  *       type: object
@@ -41,7 +47,7 @@ const roleRoutes = express.Router();
  *     description: Crea un nuevo rol en el sistema.
  *     tags: [Role]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -56,46 +62,7 @@ const roleRoutes = express.Router();
  *       500:
  *         description: Error al crear el rol.
  */
-roleRoutes.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(rolValidation), RoleController.createRole);  // Validación + Crear
-
-/**
- * @swagger
- * /api/rols:
- *   get:
- *     summary: Obtener todos los roles
- *     description: Obtiene una lista de todos los roles disponibles en el sistema.
- *     tags: [Role]
- *     responses:
- *       200:
- *         description: Lista de roles.
- *       500:
- *         description: Error al obtener los roles.
- */
-roleRoutes.get('/', verifyToken, verifyRole(['asistente']), RoleController.getAllRoles);  // Obtener todos los roles
-
-/**
- * @swagger
- * /api/rols/{id}:
- *   get:
- *     summary: Obtener un rol por su ID
- *     description: Obtiene los detalles de un rol utilizando su ID único.
- *     tags: [Role]
- *     parameters:
- *       - name: id
- *         in: path
- *         description: ID del rol
- *         required: true
- *         schema:
- *           type: number
- *     responses:
- *       200:
- *         description: Rol encontrado.
- *       404:
- *         description: Rol no encontrado con ese ID.
- *       500:
- *         description: Error al obtener el rol.
- */
-roleRoutes.get('/:id', verifyToken, verifyRole(['asistente']), RoleController.getRoleById);  // Obtener rol por ID
+roleRoutes.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(rolValidation), RoleController.createRole);
 
 /**
  * @swagger
@@ -104,6 +71,8 @@ roleRoutes.get('/:id', verifyToken, verifyRole(['asistente']), RoleController.ge
  *     summary: Actualizar un rol
  *     description: Actualiza un rol existente en el sistema.
  *     tags: [Role]
+ *     security:
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     parameters:
  *       - name: id
  *         in: path
@@ -127,7 +96,50 @@ roleRoutes.get('/:id', verifyToken, verifyRole(['asistente']), RoleController.ge
  *       500:
  *         description: Error al actualizar el rol.
  */
-roleRoutes.put('/:id', verifyToken, verifyRole(['asistente']), validatorHandler(rolValidation), RoleController.updateRole);  // Validación + Actualizar
+roleRoutes.put('/:id', verifyToken, verifyRole(['asistente']), validatorHandler(rolValidation), RoleController.updateRole);
+
+/**
+ * @swagger
+ * /api/rols:
+ *   get:
+ *     summary: Obtener todos los roles
+ *     description: Obtiene una lista de todos los roles disponibles en el sistema.
+ *     tags: [Role]
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
+ *     responses:
+ *       200:
+ *         description: Lista de roles.
+ *       500:
+ *         description: Error al obtener los roles.
+ */
+roleRoutes.get('/', verifyToken, verifyRole(['asistente']), RoleController.getAllRoles);  // Obtener todos los roles
+
+/**
+ * @swagger
+ * /api/rols/{id}:
+ *   get:
+ *     summary: Obtener un rol por su ID
+ *     description: Obtiene los detalles de un rol utilizando su ID único.
+ *     tags: [Role]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID del rol
+ *         required: true
+ *         schema:
+ *           type: number
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
+ *     responses:
+ *       200:
+ *         description: Rol encontrado.
+ *       404:
+ *         description: Rol no encontrado con ese ID.
+ *       500:
+ *         description: Error al obtener el rol.
+ */
+roleRoutes.get('/:id', verifyToken, verifyRole(['asistente']), RoleController.getRoleById);  // Obtener rol por ID
 
 /**
  * @swagger
@@ -143,6 +155,8 @@ roleRoutes.put('/:id', verifyToken, verifyRole(['asistente']), validatorHandler(
  *         required: true
  *         schema:
  *           type: number
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Rol eliminado exitosamente.

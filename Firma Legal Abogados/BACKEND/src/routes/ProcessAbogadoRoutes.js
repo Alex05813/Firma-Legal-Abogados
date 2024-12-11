@@ -16,6 +16,12 @@ const procesoAbogadoRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     ProcesoAbogado:
  *       type: object
@@ -46,7 +52,7 @@ const procesoAbogadoRouter = express.Router();
  *     description: Crea un nuevo ProcesoAbogado, asociando un proceso con un abogado.
  *     tags: [ProcesoAbogado]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -71,6 +77,8 @@ procesoAbogadoRouter.post('/', verifyToken, verifyRole(['asistente']), validator
  *     summary: Obtener un ProcesoAbogado por ID
  *     description: Obtiene los detalles de un ProcesoAbogado mediante su ID, junto con los detalles del proceso asociado.
  *     tags: [ProcesoAbogado]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_procesoabogado
@@ -96,6 +104,8 @@ procesoAbogadoRouter.get('/:id_procesoabogado', verifyToken, verifyRole(['asiste
  *     summary: Obtener todos los ProcesoAbogado
  *     description: Obtiene una lista de todos los ProcesoAbogado con filtros opcionales.
  *     tags: [ProcesoAbogado]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: id_proceso
@@ -119,6 +129,8 @@ procesoAbogadoRouter.get('/', verifyToken, verifyRole(['asistente']), validatorH
  *     summary: Editar un ProcesoAbogado
  *     description: Permite editar los detalles de un ProcesoAbogado mediante su ID.
  *     tags: [ProcesoAbogado]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_procesoabogado
@@ -142,7 +154,6 @@ procesoAbogadoRouter.get('/', verifyToken, verifyRole(['asistente']), validatorH
  */
 procesoAbogadoRouter.put('/:id_procesoabogado', verifyToken, verifyRole(['asistente']), validatorHandler(updateProcesoAbogadoSchema, 'body'), editarProcesoAbogado);
 
-
 /**
  * @swagger
  * /api/procesosabogados/{id_procesoabogado}:
@@ -150,6 +161,8 @@ procesoAbogadoRouter.put('/:id_procesoabogado', verifyToken, verifyRole(['asiste
  *     summary: Eliminar un ProcesoAbogado
  *     description: Elimina un ProcesoAbogado mediante su ID.
  *     tags: [ProcesoAbogado]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_procesoabogado

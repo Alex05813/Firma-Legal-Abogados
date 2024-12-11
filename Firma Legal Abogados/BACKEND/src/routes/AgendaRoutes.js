@@ -16,6 +16,12 @@ const agendaRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Agenda:
  *       type: object
@@ -67,7 +73,7 @@ const agendaRouter = express.Router();
  *     description: Crea una nueva agenda asociada a un proceso.
  *     tags: [Agenda]
  *     security:
- *       - bearerAuth: []  # Se requiere un token JWT para esta operación
+ *       - BearerAuth: []  # Se requiere un token JWT para esta operación
  *     requestBody:
  *       required: true
  *       content:
@@ -100,7 +106,7 @@ agendaRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []  # Requiere autenticación
+ *       - BearerAuth: []  # Requiere autenticación
  *     responses:
  *       200:
  *         description: Agenda encontrada
@@ -120,7 +126,7 @@ agendaRouter.get('/:id_agenda', verifyToken, verifyRole(['asistente', 'abogado']
  *     description: Obtiene todas las agendas registradas con filtros opcionales.
  *     tags: [Agenda]
  *     security:
- *       - bearerAuth: []  # Se requiere autenticación
+ *       - BearerAuth: []  # Se requiere autenticación
  *     responses:
  *       200:
  *         description: Agendas encontradas
@@ -145,7 +151,7 @@ agendaRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(g
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []  # Requiere autenticación
+ *       - BearerAuth: []  # Requiere autenticación
  *     requestBody:
  *       required: true
  *       content:
@@ -178,7 +184,7 @@ agendaRouter.put('/:id_agenda', verifyToken, verifyRole(['asistente']), validato
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []  # Requiere autenticación
+ *       - BearerAuth: []  # Requiere autenticación
  *     responses:
  *       200:
  *         description: Agenda eliminada con éxito

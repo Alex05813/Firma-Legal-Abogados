@@ -119,8 +119,9 @@ export const getAllFacturas = async (req, res) => {
         // Buscar todas las facturas con los filtros
         const facturas = await Factura.find(query);
 
+        // Si no hay facturas, devolver un array vacío con código 200
         if (facturas.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron facturas' });
+            return res.status(200).json([]); // Aquí devolvemos un array vacío
         }
 
         // Devolver las facturas encontradas
@@ -130,6 +131,7 @@ export const getAllFacturas = async (req, res) => {
         res.status(500).json({ message: 'Error al obtener las facturas' });
     }
 };
+
 
 // Controlador para eliminar una factura
 export const eliminarFactura = async (req, res) => {

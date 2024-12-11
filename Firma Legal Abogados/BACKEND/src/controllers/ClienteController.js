@@ -59,6 +59,27 @@ export const getCliente = async (req, res) => {
   }
 };
 
+// Controlador para obtener todos los clientes
+export const getClientes = async (req, res) => {
+  try {
+    // Obtener todos los clientes
+    const clientes = await Cliente.find().populate('usuario', 'nombres apellidos');
+
+    // Si no hay clientes, devolver un array vacío 
+    if (!clientes) {
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(clientes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al obtener los clientes' });
+  }
+};
+
+
+
+
 
 // Actualizar los datos de un cliente
 export const updateCliente = async (req, res) => {

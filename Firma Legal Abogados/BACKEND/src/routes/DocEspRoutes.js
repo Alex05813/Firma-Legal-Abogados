@@ -1,8 +1,18 @@
 import express from 'express';
-import { crearDocEsp, obtenerDocEsp, obtenerDocEspId, eliminarDocEsp } from '../controllers/DocEspController.js';
+import { 
+  crearDocEsp, 
+  obtenerDocEsp, 
+  obtenerDocEspId,
+  obtenerDocEspPorSubproceso, 
+  eliminarDocEsp 
+} from '../controllers/DocEspController.js';
 import { validatorHandler } from '../middleware/validator.handler.js';
-import { createDocEspSchema, getDocEspByIdSchema, deleteDocEspSchema } from '../validators/DocEspValidation.js';
-import { verifyToken, verifyRole } from '../middleware/Autentication.js';  
+import { 
+  createDocEspSchema, 
+  getDocEspByIdSchema, 
+  deleteDocEspSchema 
+} from '../validators/DocEspValidation.js';
+import { verifyToken, verifyRole } from '../middleware/Autentication.js';
 
 const DocEspRouter = express.Router();
 
@@ -16,6 +26,12 @@ const DocEspRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     DocEsp:
  *       type: object
@@ -37,12 +53,12 @@ const DocEspRouter = express.Router();
 
 /**
  * @swagger
- * /api/docesp:
+ * /api/DocEsp:
  *   post:
- *     summary: Crear un nuevo Documento Especifico
+ *     summary: Crear un nuevo Documento Específico
  *     tags: [DocEsp]
  *     security:
- *       - bearerAuth: []  # Indicar que esta ruta requiere autenticación con JWT
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -51,20 +67,22 @@ const DocEspRouter = express.Router();
  *             $ref: '#/components/schemas/DocEsp'
  *     responses:
  *       201:
- *         description: Documento Especifico creado exitosamente
+ *         description: Documento Específico creado exitosamente
  *       400:
- *         description: El Documento Especifico ya existe para este subproceso o el Subproceso no existe
+ *         description: El Documento Específico ya existe o el Subproceso no existe
  *       500:
- *         description: Error al crear el Documento Especifico
+ *         description: Error al crear el Documento Específico
  */
 DocEspRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(createDocEspSchema, 'body'), crearDocEsp);
 
 /**
  * @swagger
- * /api/docesp:
+ * /api/DocEsp:
  *   get:
  *     summary: Obtener todos los Documentos Específicos
  *     tags: [DocEsp]
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de Documentos Específicos
@@ -75,47 +93,76 @@ DocEspRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerDocEsp);
 
 /**
  * @swagger
- * /api/docesp/{id_DocEsp}:
+ * /api/DocEsp/{id_DocEsp}:
  *   get:
- *     summary: Obtener un Documento Especifico por su ID
+ *     summary: Obtener un Documento Específico por su ID
  *     tags: [DocEsp]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_DocEsp
  *         required: true
  *         schema:
  *           type: number
- *         description: ID del Documento Especifico
+ *         description: ID del Documento Específico
  *     responses:
  *       200:
- *         description: Documento Especifico encontrado
+ *         description: Documento Específico encontrado
  *       404:
- *         description: Documento Especifico no encontrado
+ *         description: Documento Específico no encontrado
  *       500:
- *         description: Error al obtener el Documento Especifico
+ *         description: Error al obtener el Documento Específico
  */
 DocEspRouter.get('/:id_DocEsp', verifyToken, verifyRole(['asistente']), validatorHandler(getDocEspByIdSchema, 'params'), obtenerDocEspId);
 
 /**
  * @swagger
- * /api/docesp/{id_DocEsp}:
- *   delete:
- *     summary: Eliminar un Documento Especifico por su ID
+ * /api/DocEsp/subproceso/{id_subproceso}:
+ *   get:
+ *     summary: Obtener Documentos Específicos por Subproceso
  *     tags: [DocEsp]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_subproceso
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID del Subproceso
+ *     responses:
+ *       200:
+ *         description: Documentos Específicos encontrados por Subproceso
+ *       404:
+ *         description: Subproceso no encontrado
+ *       500:
+ *         description: Error al obtener los Documentos Específicos por Subproceso
+ * */
+DocEspRouter.get('/subproceso/:id_subproceso', verifyToken, verifyRole(['asistente']), obtenerDocEspPorSubproceso);
+
+/**
+ * @swagger
+ * /api/DocEsp/{id_DocEsp}:
+ *   delete:
+ *     summary: Eliminar un Documento Específico por su ID
+ *     tags: [DocEsp]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_DocEsp
  *         required: true
  *         schema:
  *           type: number
- *         description: ID del Documento Especifico
+ *         description: ID del Documento Específico
  *     responses:
  *       200:
- *         description: Documento Especifico eliminado correctamente
+ *         description: Documento Específico eliminado correctamente
  *       404:
- *         description: Documento Especifico no encontrado
+ *         description: Documento Específico no encontrado
  *       500:
- *         description: Error al eliminar el Documento Especifico
+ *         description: Error al eliminar el Documento Específico
  */
 DocEspRouter.delete('/:id_DocEsp', verifyToken, verifyRole(['asistente']), validatorHandler(deleteDocEspSchema, 'params'), eliminarDocEsp);
 

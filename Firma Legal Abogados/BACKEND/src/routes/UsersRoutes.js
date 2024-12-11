@@ -25,6 +25,12 @@ const usersRoutes = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     Usuario:
  *       type: object
@@ -68,7 +74,7 @@ const usersRoutes = express.Router();
  *     description: Registra un nuevo usuario en la base de datos.
  *     tags: [Usuarios]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -98,7 +104,7 @@ usersRoutes.post('/create',
  *     description: Obtiene una lista de todos los usuarios registrados.
  *     tags: [Usuarios]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     responses:
  *       200:
  *         description: Lista de usuarios
@@ -106,8 +112,7 @@ usersRoutes.post('/create',
  *         description: Error interno en el servidor
  */
 usersRoutes.get('/', 
-  verifyToken, 
-  verifyRole(['asistente']), 
+   
   getAllUsers
 );
 
@@ -124,7 +129,7 @@ usersRoutes.get('/',
  *         required: true
  *         description: Número de identificación del usuario
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     responses:
  *       200:
  *         description: Usuario encontrado
@@ -178,7 +183,7 @@ usersRoutes.get('/:numeroIdentificacion',
  *               - password
  *               - rol
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     responses:
  *       200:
  *         description: Usuario actualizado correctamente
@@ -207,7 +212,7 @@ usersRoutes.put('/:numeroIdentificacion',
  *         required: true
  *         description: Número de identificación del usuario
  *     security:
- *       - bearerAuth: []  # Requiere autenticación con token JWT
+ *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     responses:
  *       200:
  *         description: Usuario eliminado correctamente

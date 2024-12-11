@@ -3,6 +3,7 @@ import { obtenerTodosTipoProcess, obtenerTipoProcessPorId, crearTipoProcess, eli
 import { validatorHandler } from '../middleware/validator.handler.js';
 import { createTipoProcessSchema, getTipoProcessByIdSchema, deleteTipoProcessSchema } from '../validators/TipoProcessValidation.js';
 import { verifyToken, verifyRole } from '../middleware/Autentication.js'; 
+
 const tipoProcessRouter = express.Router();
 
 /**
@@ -15,6 +16,12 @@ const tipoProcessRouter = express.Router();
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Se utiliza para autenticar las peticiones mediante JWT.
  *   schemas:
  *     TipoProcess:
  *       type: object
@@ -40,7 +47,7 @@ const tipoProcessRouter = express.Router();
  *     description: Crea un nuevo tipo de proceso (Notariales, Juzgados o Curadurías).
  *     tags: [Tipo de Proceso]
  *     security:
- *       - bearerAuth: []  # Requiere autenticación
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -57,6 +64,7 @@ const tipoProcessRouter = express.Router();
  */
 tipoProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(createTipoProcessSchema), crearTipoProcess);
 
+
 /**
  * @swagger
  * /api/tipoprocesos:
@@ -64,6 +72,8 @@ tipoProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHan
  *     summary: Obtener todos los tipos de proceso
  *     description: Obtiene todos los tipos de proceso almacenados en la base de datos.
  *     tags: [Tipo de Proceso]
+ *     security:
+ *       - BearerAuth: []  # Ruta protegida, requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Lista de tipos de proceso
@@ -71,6 +81,7 @@ tipoProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHan
  *         description: Error interno en el servidor
  */
 tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerTodosTipoProcess);  // No aplica validación aquí, ya que no se necesitan parámetros
+
 
 /**
  * @swagger
@@ -86,6 +97,8 @@ tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerTodosT
  *         description: ID del tipo de proceso
  *         schema:
  *           type: number
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Tipo de proceso encontrado
@@ -95,6 +108,7 @@ tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerTodosT
  *         description: Error interno en el servidor
  */
 tipoProcessRouter.get('/:id_tipo', verifyToken, verifyRole(['asistente']), validatorHandler(getTipoProcessByIdSchema, 'params'), obtenerTipoProcessPorId);
+
 
 /**
  * @swagger
@@ -110,6 +124,8 @@ tipoProcessRouter.get('/:id_tipo', verifyToken, verifyRole(['asistente']), valid
  *         description: ID del tipo de proceso
  *         schema:
  *           type: number
+ *     security:
+ *       - BearerAuth: []  # Requiere autenticación con JWT
  *     responses:
  *       200:
  *         description: Tipo de proceso eliminado con éxito
