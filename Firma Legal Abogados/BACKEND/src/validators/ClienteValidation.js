@@ -44,3 +44,10 @@ export const getClienteSchema = Joi.object({
     'any.required': 'El número de identificación es obligatorio.'
   })
 });
+
+// Validación para obtener todos los clientes
+export const getClientesSchema = Joi.object({
+  // Aquí no necesitamos parámetros, pero sí un validador para la autenticación
+    'string.pattern.base': 'El token de autenticación es inválido.',
+    'any.required': 'El token de autenticación es obligatorio.',
+  });
