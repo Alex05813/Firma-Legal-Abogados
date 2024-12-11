@@ -67,6 +67,32 @@ export const obtenerDocEspId = async (req, res) => {
     }
 };
 
+// Obtener documentos basados en el subproceso
+export const obtenerDocEspPorSubproceso = async (req, res) => {
+    try {
+      const { id_subproceso } = req.params;
+  
+      console.log('ID del Subproceso:', id_subproceso);
+  
+      // Buscar documentos en la base de datos
+      const documentos = await DocEsp.find({ id_subproceso });
+  
+      console.log('Documentos encontrados:', documentos);
+  
+      if (!documentos || !documentos.length) {
+        return res.status(404).json({ message: 'No se encontraron documentos para este subproceso' });
+      }
+  
+      res.status(200).json(documentos);
+  
+    } catch (error) {
+      console.error('Error al obtener documentos:', error.message);
+      res.status(500).json({ message: 'Error al obtener los Documentos Específicos', error: error.message });
+    }
+  };
+  
+
+
 // Eliminar DocEsp por id
 export const eliminarDocEsp = async (req, res) => {
     try {
