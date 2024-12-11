@@ -2,12 +2,23 @@ import Proceso from '../models/ProcessModel.js';
 import Cliente from '../models/ClienteModel.js';
 import Abogado from '../models/AbogadoModel.js';
 import TipoProcess from '../models/TipoProcessModel.js';
+import DocEsp from '../models/DocEspModel.js';
+import Subproceso from '../models/SubProcessModel.js';
 
 // Controlador para crear un proceso
 export const crearProceso = async (req, res) => {
   try {
-
-    const { id_proceso, descripcion, fecha_inicio, estado, numeroIdentificacionCliente, numeroIdentificacionAbogado, id_tipo } = req.body;
+    const {
+      id_proceso,
+      descripcion,
+      fecha_inicio,
+      estado,
+      numeroIdentificacionCliente,
+      numeroIdentificacionAbogado,
+      id_tipo,
+      id_subproceso,  // id_subproceso como número
+      id_docesp,      // id_docesp como número
+    } = req.body;
 
     // Verificar si el cliente con ese número de identificación existe
     const clienteExistente = await Cliente.findOne({ numeroIdentificacion: numeroIdentificacionCliente });
@@ -21,13 +32,31 @@ export const crearProceso = async (req, res) => {
       return res.status(404).json({ mensaje: 'Abogado no encontrado con ese número de identificación' });
     }
 
-    // Verificamos si el tipo existe en la base de datos usando el id_tipo como número
-    const tipoprocesos = await TipoProcess.findOne({ id_tipo }); 
-    if (!tipoprocesos) {
-      return res.status(400).json({ message: 'Tipo no encontrado' });
+    // Verificar si el tipo de proceso existe
+    const tipoExistente = await TipoProcess.findOne({ id_tipo });
+    if (!tipoExistente) {
+      return res.status(400).json({ mensaje: 'Tipo de proceso no encontrado' });
     }
 
-    // Verificar si ya existe un proceso con ese id_proceso
+    // Verificar si el subproceso existe (si se pasa)
+    let subprocesoExistente = null;
+    if (id_subproceso) {
+      subprocesoExistente = await Subproceso.findOne({ id_subproceso });
+      if (!subprocesoExistente) {
+        return res.status(404).json({ mensaje: 'Subproceso no encontrado' });
+      }
+    }
+
+    // Verificar si el documento especial existe (si se pasa)
+    let documentoExistente = null;
+    if (id_docesp) {
+      documentoExistente = await DocEsp.findOne({ id_docesp });
+      if (!documentoExistente) {
+        return res.status(404).json({ mensaje: 'Documento especial no encontrado' });
+      }
+    }
+
+    // Verificar si ya existe un proceso con el mismo id_proceso
     const procesoExistente = await Proceso.findOne({ id_proceso });
     if (procesoExistente) {
       return res.status(400).json({ mensaje: 'Ya existe un proceso con ese ID' });
@@ -42,26 +71,32 @@ export const crearProceso = async (req, res) => {
       numeroIdentificacionCliente,
       numeroIdentificacionAbogado,
       id_tipo,
+      id_subproceso: subprocesoExistente ? subprocesoExistente.id_subproceso : null,  // Asignamos el ID numérico
+      id_docesp: documentoExistente ? documentoExistente.id_docesp : null,  // Asignamos el ID numérico
     });
 
     // Guardar el proceso en la base de datos
     await nuevoProceso.save();
     res.status(201).json(nuevoProceso);
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al crear el proceso' });
+    console.error('Error al crear el proceso:', error);
+    res.status(500).json({ mensaje: 'Error al crear el proceso', error: error.message });
   }
 };
+
 
 // Controlador para obtener un proceso por ID
 export const getProceso = async (req, res) => {
   try {
     const { id_proceso } = req.params;
 
-    // Buscar el proceso y poblar los campos de cliente y abogado
+    // Buscar el proceso y poblar los campos de cliente, abogado, subproceso y documento especial
     const proceso = await Proceso.findOne({ id_proceso })
       .populate('numeroIdentificacionCliente', 'nombre apellido')  // Poblar cliente
-      .populate('numeroIdentificacionAbogado', 'nombre apellido');  // Poblar abogado
+      .populate('numeroIdentificacionAbogado', 'nombre apellido')  // Poblar abogado
+      .populate('id_subproceso', 'nombre')  // Poblar subproceso (si existe)
+      .populate('id_docesp', 'nombre');  // Poblar documento especial (si existe)
 
     if (!proceso) {
       return res.status(404).json({ mensaje: 'Proceso no encontrado' });
@@ -73,14 +108,14 @@ export const getProceso = async (req, res) => {
     // Responder con el proceso y su tipo
     res.status(200).json({
       ...proceso.toObject(),
-      tipo: tipo ? tipo.nombre : null  // Agregar el nombre del tipo de proceso
+      tipo: tipo ? tipo.nombre : null,  // Agregar el nombre del tipo de proceso
     });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener el proceso' });
+    console.error('Error al obtener el proceso:', error);
+    res.status(500).json({ mensaje: 'Error al obtener el proceso', error: error.message });
   }
 };
-
 
 // Controlador para obtener todos los procesos
 export const getAllProcesos = async (req, res) => {
@@ -114,10 +149,89 @@ export const getAllProcesos = async (req, res) => {
 
     res.status(200).json(procesosConTipo);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener los procesos' });
+    console.error('Error al obtener los procesos:', error);
+    res.status(500).json({ mensaje: 'Error al obtener los procesos', error: error.message });
   }
 };
+
+// Controlador para actualizar un proceso por ID
+export const actualizarProceso = async (req, res) => {
+  try {
+    const { id_proceso } = req.params;
+    const {
+      descripcion,
+      fecha_inicio,
+      estado,
+      numeroIdentificacionCliente,
+      numeroIdentificacionAbogado,
+      id_tipo,
+      id_subproceso,
+      id_docesp,
+    } = req.body;
+
+    // Verificar si el proceso existe
+    const procesoExistente = await Proceso.findOne({ id_proceso });
+    if (!procesoExistente) {
+      return res.status(404).json({ mensaje: 'Proceso no encontrado' });
+    }
+
+    // Verificar si el cliente con ese número de identificación existe
+    const clienteExistente = await Cliente.findOne({ numeroIdentificacion: numeroIdentificacionCliente });
+    if (!clienteExistente) {
+      return res.status(404).json({ mensaje: 'Cliente no encontrado con ese número de identificación' });
+    }
+
+    // Verificar si el abogado con ese número de identificación existe
+    const abogadoExistente = await Abogado.findOne({ numeroIdentificacion: numeroIdentificacionAbogado });
+    if (!abogadoExistente) {
+      return res.status(404).json({ mensaje: 'Abogado no encontrado con ese número de identificación' });
+    }
+
+    // Verificar si el tipo de proceso existe
+    const tipoExistente = await TipoProcess.findOne({ id_tipo });
+    if (!tipoExistente) {
+      return res.status(400).json({ mensaje: 'Tipo de proceso no encontrado' });
+    }
+
+    // Verificar si el subproceso existe (si se pasa)
+    let subprocesoExistente = null;
+    if (id_subproceso) {
+      subprocesoExistente = await Subproceso.findOne({ id_subproceso });
+      if (!subprocesoExistente) {
+        return res.status(404).json({ mensaje: 'Subproceso no encontrado' });
+      }
+    }
+
+    // Verificar si el documento especial existe (si se pasa)
+    let documentoExistente = null;
+    if (id_docesp) {
+      documentoExistente = await DocEsp.findOne({ id_docesp });
+      if (!documentoExistente) {
+        return res.status(404).json({ mensaje: 'Documento especial no encontrado' });
+      }
+    }
+
+    // Actualizar el proceso
+    procesoExistente.descripcion = descripcion;
+    procesoExistente.fecha_inicio = fecha_inicio;
+    procesoExistente.estado = estado;
+    procesoExistente.numeroIdentificacionCliente = numeroIdentificacionCliente;
+    procesoExistente.numeroIdentificacionAbogado = numeroIdentificacionAbogado;
+    procesoExistente.id_tipo = id_tipo;
+    procesoExistente.id_subproceso = subprocesoExistente ? subprocesoExistente.id_subproceso : null;
+    procesoExistente.id_docesp = documentoExistente ? documentoExistente.id_docesp : null;
+
+    // Guardar los cambios
+    await procesoExistente.save();
+
+    res.status(200).json({ mensaje: 'Proceso actualizado con éxito', proceso: procesoExistente });
+  } catch (error) {
+    console.error('Error al actualizar el proceso:', error);
+    res.status(500).json({ mensaje: 'Error al actualizar el proceso', error: error.message });
+  }
+};
+
+
 
 // Controlador para eliminar un proceso
 export const eliminarProceso = async (req, res) => {
@@ -133,8 +247,9 @@ export const eliminarProceso = async (req, res) => {
     // Eliminar el proceso
     await Proceso.deleteOne({ id_proceso });
     res.status(200).json({ mensaje: 'Proceso eliminado con éxito' });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al eliminar el proceso' });
+    console.error('Error al eliminar el proceso:', error);
+    res.status(500).json({ mensaje: 'Error al eliminar el proceso', error: error.message });
   }
 };
