@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Spinner, Button, Table, Form, Card, Toast, Modal } from "react-bootstrap";
-import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs"; 
-import { FiCheckCircle, FiXCircle } from "react-icons/fi"; 
-import { motion } from "framer-motion"; 
-import '../../style/tableStyle.css';
-
-
+import { Spinner, Button, Table, Form, Card } from "react-bootstrap";
+import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext.jsx"; // Asegúrate de tener el contexto de autenticación
+import Notification from "../../components/Notification/Notification.jsx";
+import Delete from "../../components/Delete/Delete.jsx";
+import "../../style/tableStyle.css";
 
 function Usuario() {
+  const { isAuthenticated, role } = useContext(AuthContext); // Para verificar si está autenticado
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newUser, setNewUser] = useState({
@@ -21,120 +24,50 @@ function Usuario() {
     password: "",
     id_rol: "",
   });
-
-  const [roles, setRoles] = useState([]);
-  const [alert, setAlert] = useState({ message: "", type: "" });
   const [isEditing, setIsEditing] = useState(false);
-
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
-  const [showModal, setShowModal] = useState(false); // Modal state for confirmation
-  const [userToDelete, setUserToDelete] = useState(null); // Store the user to delete
-
+  // Verificar autenticación al cargar
   useEffect(() => {
-    const fetchUsers = async () => {
+    if (!isAuthenticated) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
       try {
-        const response = await axios.get("http://localhost:9000/api/usuarios");
-        setUsers(response.data.data);
-        setLoading(false);
+        // Obtener usuarios y roles en paralelo
+        const [usuariosResponse, rolesResponse] = await Promise.all([
+          axios.get("http://localhost:9000/api/usuarios", { headers: { Authorization: token } }),
+          axios.get("http://localhost:9000/api/rols", { headers: { Authorization: token } }),
+        ]);
+
+        setUsers(usuariosResponse.data.data);
+        setRoles(rolesResponse.data);
       } catch (err) {
-        setError("Error al cargar los usuarios");
+        setError("Error al cargar los datos");
+        console.error("Error:", err);
+      } finally {
         setLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
 
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get("http://localhost:9000/api/rols");
-        setRoles(response.data);
-      } catch (err) {
-        setError("Error al cargar los roles");
-      }
-    };
-    fetchRoles();
-  }, []);
+    fetchData();
+  }, [isAuthenticated, navigate]);
 
+  // Manejo del cambio de campos en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewUser({ ...newUser, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      try {
-        await axios.put(`http://localhost:9000/api/usuarios/${newUser.numeroIdentificacion}`, newUser);
-        setToastMessage("Usuario actualizado con éxito");
-        setToastType("success");
-        setShowToast(true);
-        setIsEditing(false);
-        setNewUser({
-          numeroIdentificacion: "",
-          nombres: "",
-          apellidos: "",
-          telefono: "",
-          email: "",
-          password: "",
-          id_rol: "",
-        });
-        const response = await axios.get("http://localhost:9000/api/usuarios");
-        setUsers(response.data.data);
-      } catch (err) {
-        setToastMessage("Error al actualizar el usuario");
-        setToastType("danger");
-        setShowToast(true);
-      }
-    } else {
-      try {
-        await axios.post("http://localhost:9000/api/usuarios/create", newUser);
-        setToastMessage("Usuario creado con éxito");
-        setToastType("success");
-        setShowToast(true);
-        setNewUser({
-          numeroIdentificacion: "",
-          nombres: "",
-          apellidos: "",
-          telefono: "",
-          email: "",
-          password: "",
-          id_rol: "",
-        });
-        const response = await axios.get("http://localhost:9000/api/usuarios");
-        setUsers(response.data.data);
-      } catch (err) {
-        setToastMessage("Error al crear usuario");
-        setToastType("danger");
-        setShowToast(true);
-      }
-    }
-  };
-
-  const handleDelete = (user) => {
-    setUserToDelete(user);
-    setShowModal(true);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:9000/api/usuarios/${userToDelete.numeroIdentificacion}`);
-      setToastMessage("Usuario eliminado con éxito");
-      setToastType("success");
-      setShowToast(true);
-      setUsers(users.filter(user => user.numeroIdentificacion !== userToDelete.numeroIdentificacion));
-      setShowModal(false); // Close the modal
-    } catch (err) {
-      setToastMessage("Error al eliminar usuario");
-      setToastType("danger");
-      setShowToast(true);
-      setShowModal(false); // Close the modal
-    }
-  };
-
+  // Función para iniciar el proceso de edición
   const handleEdit = (user) => {
     setIsEditing(true);
     setNewUser({
@@ -143,11 +76,85 @@ function Usuario() {
       apellidos: user.apellidos,
       telefono: user.telefono,
       email: user.email,
-      password: "",
+      password: "", // No se debe cargar la contraseña al editar
       id_rol: user.id_rol,
     });
   };
 
+  // Manejo del envío del formulario (crear o actualizar usuario)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      const apiCall = isEditing
+        ? axios.put(
+          `http://localhost:9000/api/usuarios/${newUser.numeroIdentificacion}`,
+          newUser,
+          { headers: { Authorization: token } }
+        )
+        : axios.post(
+          "http://localhost:9000/api/usuarios/create",
+          newUser,
+          { headers: { Authorization: token } }
+        );
+
+      await apiCall;
+
+      setToastMessage(isEditing ? "Usuario actualizado con éxito" : "Usuario creado con éxito");
+      setToastType("success");
+      setShowToast(true);
+
+      // Restablecer los valores del formulario
+      setNewUser({
+        numeroIdentificacion: "",
+        nombres: "",
+        apellidos: "",
+        telefono: "",
+        email: "",
+        password: "",
+        id_rol: "",
+      });
+
+      // Actualizar la lista de usuarios
+      const response = await axios.get("http://localhost:9000/api/usuarios", { headers: { Authorization: token } });
+      setUsers(response.data.data);
+      setIsEditing(false);
+    } catch (err) {
+      setToastMessage(isEditing ? "Error al actualizar el usuario" : "Error al crear usuario");
+      setToastType("danger");
+      setShowToast(true);
+    }
+  };
+
+  // Manejo de la eliminación de usuario
+  const handleDelete = (user) => {
+    setUserToDelete(user);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(`http://localhost:9000/api/usuarios/${userToDelete.numeroIdentificacion}`, {
+        headers: { Authorization: token },
+      });
+
+      setToastMessage("Usuario eliminado con éxito");
+      setToastType("success");
+      setShowToast(true);
+      setUsers(users.filter((user) => user.numeroIdentificacion !== userToDelete.numeroIdentificacion));
+      setShowModal(false);
+    } catch (err) {
+      setToastMessage("Error al eliminar el usuario");
+      setToastType("danger");
+      setShowToast(true);
+      setShowModal(false);
+    }
+  };
+
+  // Lógica de mostrar el spinner y el error si está cargando
   if (loading) {
     return (
       <div className="text-center my-5">
@@ -163,18 +170,18 @@ function Usuario() {
   return (
     <div className="full-width">
       {/* Notification */}
-      <Notification 
-        showToast={showToast} 
-        setShowToast={setShowToast} 
-        toastMessage={toastMessage} 
-        toastType={toastType} 
+      <Notification
+        showToast={showToast}
+        setShowToast={setShowToast}
+        toastMessage={toastMessage}
+        toastType={toastType}
       />
 
       {/* Modal for Deletion Confirmation */}
-      <Delete 
-        showModal={showModal} 
-        setShowModal={setShowModal} 
-        confirmDelete={confirmDelete} 
+      <Delete
+        showModal={showModal}
+        setShowModal={setShowModal}
+        confirmDelete={confirmDelete}
       />
 
       <div className="row">
@@ -281,9 +288,10 @@ function Usuario() {
                   </Form.Control>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" block>
+                <Button variant="primary" type="submit" block="true">
                   {isEditing ? "Actualizar Usuario" : "Crear Usuario"}
                 </Button>
+
               </Form>
             </Card.Body>
           </Card>
@@ -310,7 +318,7 @@ function Usuario() {
                       <td>{user.nombres} {user.apellidos}</td>
                       <td>{user.email}</td>
                       <td>{user.telefono}</td>
-                      <td>{user.rol?.nombre}</td>
+                      <td>{user.id_rol?.nombre}</td>
                       <td>
                         <Button variant="info" onClick={() => handleEdit(user)} className="me-2">
                           <BsFillPencilFill />
