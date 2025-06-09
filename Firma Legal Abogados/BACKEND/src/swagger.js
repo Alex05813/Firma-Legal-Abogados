@@ -20,11 +20,12 @@ const options = {
           type: 'apiKey',
           in: 'header',
           name: 'Authorization',
+          description: 'Se utiliza para autenticar las peticiones mediante JWT.',
         }
       },
     },
     security: [
-      { BearerAuth: [] },
+      { BearerAuth: [] }, // Esto asegura que la autenticación se aplica a todas las rutas de forma global
     ],
   },
   apis: [

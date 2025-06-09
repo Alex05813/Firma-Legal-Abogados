@@ -89,7 +89,7 @@ DocEspRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler(
  *       500:
  *         description: Error al obtener los Documentos Específicos
  */
-DocEspRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerDocEsp);
+DocEspRouter.get('/', verifyToken, verifyRole(['asistente', 'abogado']), obtenerDocEsp);
 
 /**
  * @swagger
@@ -114,7 +114,7 @@ DocEspRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerDocEsp);
  *       500:
  *         description: Error al obtener el Documento Específico
  */
-DocEspRouter.get('/:id_DocEsp', verifyToken, verifyRole(['asistente']), validatorHandler(getDocEspByIdSchema, 'params'), obtenerDocEspId);
+DocEspRouter.get('/:id_DocEsp', verifyToken, verifyRole(['asistente', 'abogado']), validatorHandler(getDocEspByIdSchema, 'params'), obtenerDocEspId);
 
 /**
  * @swagger

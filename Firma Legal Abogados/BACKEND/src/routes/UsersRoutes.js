@@ -50,10 +50,7 @@ const usersRoutes = express.Router();
  *         email:
  *           type: string
  *           description: Correo electrónico del usuario.
- *         password:
- *           type: string
- *           description: Contraseña del usuario.
- *         rol:
+ *         id_rol:
  *           type: string
  *           description: El rol del usuario (por ejemplo, 'admin', 'usuario').
  *       required:
@@ -62,8 +59,7 @@ const usersRoutes = express.Router();
  *         - apellidos
  *         - telefono
  *         - email
- *         - password
- *         - rol
+ *         - id_rol
  */
 
 /**
@@ -112,7 +108,8 @@ usersRoutes.post('/create',
  *         description: Error interno en el servidor
  */
 usersRoutes.get('/', 
-   
+  verifyToken,
+  verifyRole(['asistente']),
   getAllUsers
 );
 
@@ -140,7 +137,7 @@ usersRoutes.get('/',
  */
 usersRoutes.get('/:numeroIdentificacion', 
   verifyToken, 
-  verifyRole(['asistente']), 
+  verifyRole(['asistente', 'cliente']), 
   getUserById
 );
 
@@ -171,17 +168,14 @@ usersRoutes.get('/:numeroIdentificacion',
  *                 type: string
  *               email:
  *                 type: string
- *               password:
- *                 type: string
- *               rol:
+ *               id_rol:
  *                 type: string
  *             required:
  *               - nombres
  *               - apellidos
  *               - telefono
  *               - email
- *               - password
- *               - rol
+ *               - id_rol
  *     security:
  *       - BearerAuth: []  # Requiere autenticación con token JWT
  *     responses:
@@ -193,8 +187,8 @@ usersRoutes.get('/:numeroIdentificacion',
  *         description: Error interno en el servidor
  */
 usersRoutes.put('/:numeroIdentificacion', 
-  verifyToken, 
-  verifyRole(['asistente']), 
+  verifyToken,
+  verifyRole(['asistente']),
   validatorHandler(updateUserSchema, 'body'), 
   updateUser
 );

@@ -27,6 +27,7 @@ Content-Type: application/json
 
 ### Obtener todos los tipos de proceso
 GET http://localhost:9000/api/tipoprocesos
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJudW1lcm9JZGVudGlmaWNhY2lvbiI6IjEwMTAxMDEwMTAiLCJub21icmUiOiJMYW1pbmUiLCJhcGVsbGlkbyI6IllhbWFsIiwiZW1haWwiOiJsYW1pbmVAZXhhbXBsZS5jb20iLCJub21icmVfcm9sIjoiYWJvZ2FkbyIsImlhdCI6MTc0MDM2MDM3MywiZXhwIjoxNzQwMzYzOTczfQ.crDK6R2BFf2svHcJ256LPEKyfCi69uqCnHPnkfEQ-a0
 
 ### Obtener un tipo de proceso por ID
 GET http://localhost:9000/api/tipoprocesos/3

@@ -43,7 +43,7 @@ Content-Type: application/json
 ###
 
 # Eliminar una factura por ID
-DELETE http://localhost:9000/api/facturas/2
+DELETE http://localhost:9000/api/facturas/1
 Content-Type: application/json
 
 ###

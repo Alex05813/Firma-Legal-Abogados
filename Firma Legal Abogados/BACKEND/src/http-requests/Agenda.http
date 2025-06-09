@@ -22,6 +22,7 @@ Content-Type: application/json
 ### Obtener todas las Agendas
 GET http://localhost:9000/api/agendas
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJudW1lcm9JZGVudGlmaWNhY2lvbiI6IjEwMjkxNDQ1MjEiLCJub21icmUiOiJKdWFuIFBhYmxvIiwiYXBlbGxpZG8iOiJEaWF6IEJhbGNhemFyIiwiZW1haWwiOiJqdWFuQGdtYWlsLmNvbSIsIm5vbWJyZV9yb2wiOiJhYm9nYWRvIiwiaWF0IjoxNzQwMDk2NjU2LCJleHAiOjE3NDAxMDAyNTZ9.bVQYYc3NgjHj83eePKc69-Nf8HPWapsPqPlA14qssD0
 
 ###
 

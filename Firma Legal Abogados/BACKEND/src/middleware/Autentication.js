@@ -5,7 +5,8 @@ const verifyToken = (req, res, next) => {
     const token = req.header('Authorization');
 
     if (!token) {
-        return res.status(401).json({ message: 'Token de autenticación no proporcionado' });
+        return res.status(401).json({ message: 
+            'Token de autenticación no proporcionado' });
     }
 
     try {
@@ -19,7 +20,7 @@ const verifyToken = (req, res, next) => {
 
 // Middleware para verificar el rol del usuario
 const verifyRole = (rolesPermitidos) => (req, res, next) => {
-    const userRole = req.user.nombre_rol;  // Cambiar de 'id_rol' a 'nombre_rol'
+    const userRole = req.user.nombre_rol;  
     // Si el rol del usuario está en la lista de roles permitidos, continúa
     if (rolesPermitidos.includes(userRole)) {
         return next();

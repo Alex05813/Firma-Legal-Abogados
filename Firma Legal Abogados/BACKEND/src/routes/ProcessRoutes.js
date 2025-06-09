@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearProceso, getProceso, getAllProcesos, eliminarProceso, actualizarProceso } from '../controllers/ProcessController.js';
+import { crearProceso, /*get_process_id*/ getAllProcesos, eliminarProceso, actualizarProceso, get_especify_process } from '../controllers/ProcessController.js';
 import { createProcesoSchema, getAllProcesosSchema, getProcesoByIdSchema, deleteProcesoSchema } from '../validators/ProcessValidation.js';
 import { validatorHandler } from '../middleware/validator.handler.js';
 import { verifyToken, verifyRole } from '../middleware/Autentication.js'; 
@@ -94,8 +94,7 @@ ProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHandler
  *       500:
  *         description: Error interno en el servidor
  */
-ProcessRouter.get('/:id_proceso', verifyToken, verifyRole(['asistente', 'abogado']), validatorHandler(getProcesoByIdSchema, 'params'), getProceso);
-
+// ProcessRouter.get('/:id_proceso', verifyToken, verifyRole(['asistente', 'abogado']), validatorHandler(getProcesoByIdSchema, 'params'), get_process_id);
 
 /**
  * @swagger
@@ -112,7 +111,7 @@ ProcessRouter.get('/:id_proceso', verifyToken, verifyRole(['asistente', 'abogado
  *       500:
  *         description: Error interno en el servidor
  */
-ProcessRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(getAllProcesosSchema, 'query'), getAllProcesos);
+ProcessRouter.get('/', verifyToken, verifyRole(['asistente', 'abogado', 'cliente']), validatorHandler(getAllProcesosSchema, 'query'), getAllProcesos);
 
 
 /**
@@ -147,7 +146,7 @@ ProcessRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(
  *       500:
  *         description: Error interno en el servidor
  */
-ProcessRouter.put('/:id_proceso', verifyToken, verifyRole(['asistente']), validatorHandler(createProcesoSchema, 'body'), actualizarProceso);
+ ProcessRouter.put('/:id_proceso', verifyToken, verifyRole(['asistente']), validatorHandler(createProcesoSchema, 'body'), actualizarProceso);
 
 
 /**
@@ -175,5 +174,33 @@ ProcessRouter.put('/:id_proceso', verifyToken, verifyRole(['asistente']), valida
  *         description: Error interno en el servidor
  */
 ProcessRouter.delete('/:id_proceso', verifyToken, verifyRole(['asistente']), validatorHandler(deleteProcesoSchema, 'params'), eliminarProceso);
+
+
+/**
+ * @swagger
+ * /api/procesos/{numeroIdentificacionCliente}:
+ *   get:
+ *     summary: Buscar un proceso por el numero de identificacion de su cliente
+ *     description: Buscar el proceso asociado a un cliente en especifico
+ *     tags: [Procesos]
+ *     parameters:
+ *       - in: path
+ *         name: numeroIdentificacionCliente
+ *         required: true
+ *         description: Numero identificacion del cliente
+ *         schema:
+ *           type: number
+ *     security:
+ *       - BearerAuth: []  # Ruta protegida, requiere autenticación con JWT
+ *     responses:
+ *       200:
+ *         description: Proceso eliminado con éxito
+ *       404:
+ *         description: Proceso no encontrado
+ *       500:
+ *         description: Error interno en el servidor
+ */
+ProcessRouter.get('/:numeroIdentificacionCliente', get_especify_process)
+
 
 export default ProcessRouter;

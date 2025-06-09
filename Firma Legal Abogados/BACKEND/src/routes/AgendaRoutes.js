@@ -133,7 +133,7 @@ agendaRouter.get('/:id_agenda', verifyToken, verifyRole(['asistente', 'abogado']
  *       500:
  *         description: Error interno en el servidor
  */
-agendaRouter.get('/', verifyToken, verifyRole(['asistente']), validatorHandler(getAllAgendasSchema), getAllAgendas);
+agendaRouter.get('/', verifyToken, verifyRole(['asistente', 'abogado']), validatorHandler(getAllAgendasSchema), getAllAgendas);
 
 
 /**

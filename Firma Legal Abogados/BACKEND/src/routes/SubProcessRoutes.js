@@ -103,7 +103,7 @@ subProcessRouter.post(
 subProcessRouter.get(
   '/', 
   verifyToken, 
-  verifyRole(['asistente']), 
+  verifyRole(['asistente', 'abogado']), 
   obtenerSubprocesos
 );
 
@@ -138,7 +138,7 @@ subProcessRouter.get(
 subProcessRouter.get(
   '/:id_subproceso', 
   verifyToken, 
-  verifyRole(['asistente']), 
+  verifyRole(['asistente', 'abogado']), 
   validatorHandler(getSubprocesoByIdSchema, 'params'), 
   obtenerSubproceso
 );

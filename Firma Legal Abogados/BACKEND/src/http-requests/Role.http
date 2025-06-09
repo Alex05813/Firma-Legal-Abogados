@@ -3,8 +3,8 @@ POST http://localhost:9000/api/rols
 Content-Type: application/json
 
 {
-  "id_rol": 3,
-  "nombre": "cliente"
+  "id_rol": 2,
+  "nombre": "asistente"
 }
 
 ### Obtener todos los roles (GET)
