@@ -36,6 +36,14 @@ export const createProcesoSchema = Joi.object({
     'any.required': 'El tipo es obligatorio.',
     'number.base': 'El tipo debe ser un número válido.',
   }),
+
+  id_subproceso: Joi.string().optional().messages({
+    'number.base': 'El id_subproceso debe ser un número válido.',
+  }),
+
+  id_documento: Joi.string().optional().messages({
+    'number.base': 'El id_documentoun debe ser un número válido',
+  }),
 });
 
 // Esquema de validación para obtener todos los procesos (opcionalmente por estado o tipo)

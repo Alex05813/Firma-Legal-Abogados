@@ -21,20 +21,12 @@ export const createUserSchema = Joi.object({
     'string.email': 'El correo electrónico debe ser válido.',
     'any.required': 'El correo electrónico es obligatorio.'
   }),
-  password: Joi.string().min(6).required().messages({
-    'string.min': 'La contraseña debe tener al menos 6 caracteres.',
-    'any.required': 'La contraseña es obligatoria.'
-  }),
-  // Validación de ObjectId para el rol
   id_rol: Joi.number().required().messages({
     'any.required': 'El rol es obligatorio.',
     'number.base': 'El rol debe ser un número válido.',
   }),
-  
-  
 });
 
-// Esquema de validación para la actualización de un usuario
 export const updateUserSchema = Joi.object({
   numeroIdentificacion: Joi.string().pattern(/^\d{7,10}$/).optional().messages({
     'string.pattern.base': 'El número de identificación debe tener entre 7 y 10 dígitos.',
@@ -54,14 +46,12 @@ export const updateUserSchema = Joi.object({
   password: Joi.string().min(6).optional().messages({
     'string.min': 'La contraseña debe tener al menos 6 caracteres.',
   }),
-  // Aquí cambiamos la validación para que también acepte un ObjectId de MongoDB para el rol
   id_rol: Joi.number().required().messages({
     'any.required': 'El rol es obligatorio.',
     'number.base': 'El rol debe ser un número válido.',
   }),
 });
 
-// Esquema de validación para obtener un usuario por su número de identificación
 export const getUserSchema = Joi.object({
   numeroIdentificacion: Joi.string().pattern(/^\d{7,10}$/).required().messages({
     'string.pattern.base': 'El número de identificación debe tener entre 7 y 10 dígitos.',
@@ -69,7 +59,6 @@ export const getUserSchema = Joi.object({
   }),
 });
 
-// Esquema de validación para eliminar un usuario por su número de identificación
 export const deleteUserSchema = Joi.object({
   numeroIdentificacion: Joi.string().pattern(/^\d{7,10}$/).required().messages({
     'string.pattern.base': 'El número de identificación debe tener entre 7 y 10 dígitos.',
@@ -77,7 +66,6 @@ export const deleteUserSchema = Joi.object({
   }),
 });
 
-// Esquema de validación para el login de un usuario
 export const loginUserSchema = Joi.object({
   email: Joi.string().email().required().messages({
     'string.email': 'El correo electrónico debe ser válido.',

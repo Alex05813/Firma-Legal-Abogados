@@ -3,6 +3,6 @@ POST http://localhost:9000/api/autenticacion
 Content-Type: application/json
 
 {
-  "email": "alex@gmail.com",
+  "email": "alexander.perdomo@gmail.com",
   "password": "segura123"
 }

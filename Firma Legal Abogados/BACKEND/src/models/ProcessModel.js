@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import Cliente from './ClienteModel.js';
 import Abogado from './AbogadoModel.js';
 import TipoProcess from './TipoProcessModel.js';  
+import DocEsp from './DocEspModel.js';
+import Subproceso from './SubProcessModel.js';
 
 const procesoSchema = new mongoose.Schema({
   id_proceso: {
@@ -62,7 +64,20 @@ const procesoSchema = new mongoose.Schema({
     ref: TipoProcess,  
     required: true,
   },
+
+  id_subproceso: {
+    type: Number,
+    ref: Subproceso,
+    required: false
+  },
+
+  id_docesp: {
+    type: Number,
+    ref: DocEsp,
+    required: false
+  }
 }, { timestamps: true });
+
 
 const Proceso = mongoose.model('Proceso', procesoSchema);
 

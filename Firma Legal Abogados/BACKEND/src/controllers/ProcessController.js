@@ -1,11 +1,12 @@
 import Proceso from '../models/ProcessModel.js';
+import mongoose from 'mongoose'; // Asegúrate de importar mongoose
 import Cliente from '../models/ClienteModel.js';
 import Abogado from '../models/AbogadoModel.js';
 import TipoProcess from '../models/TipoProcessModel.js';
 import DocEsp from '../models/DocEspModel.js';
-import Subproceso from '../models/SubProcessModel.js';
+import SubProcess from '../models/SubProcessModel.js'; // Agregar esta importación
 
-// Controlador para crear un proceso
+// 1. Controlador para crear un proceso
 export const crearProceso = async (req, res) => {
   try {
     const {
@@ -41,7 +42,7 @@ export const crearProceso = async (req, res) => {
     // Verificar si el subproceso existe (si se pasa)
     let subprocesoExistente = null;
     if (id_subproceso) {
-      subprocesoExistente = await Subproceso.findOne({ id_subproceso });
+      subprocesoExistente = await SubProcess.findOne({ id_subproceso });
       if (!subprocesoExistente) {
         return res.status(404).json({ mensaje: 'Subproceso no encontrado' });
       }
@@ -85,39 +86,7 @@ export const crearProceso = async (req, res) => {
   }
 };
 
-
-// Controlador para obtener un proceso por ID
-export const getProceso = async (req, res) => {
-  try {
-    const { id_proceso } = req.params;
-
-    // Buscar el proceso y poblar los campos de cliente, abogado, subproceso y documento especial
-    const proceso = await Proceso.findOne({ id_proceso })
-      .populate('numeroIdentificacionCliente', 'nombre apellido')  // Poblar cliente
-      .populate('numeroIdentificacionAbogado', 'nombre apellido')  // Poblar abogado
-      .populate('id_subproceso', 'nombre')  // Poblar subproceso (si existe)
-      .populate('id_docesp', 'nombre');  // Poblar documento especial (si existe)
-
-    if (!proceso) {
-      return res.status(404).json({ mensaje: 'Proceso no encontrado' });
-    }
-
-    // Obtener el tipo de proceso correspondiente
-    const tipo = await TipoProcess.findOne({ id_tipo: proceso.id_tipo });
-
-    // Responder con el proceso y su tipo
-    res.status(200).json({
-      ...proceso.toObject(),
-      tipo: tipo ? tipo.nombre : null,  // Agregar el nombre del tipo de proceso
-    });
-
-  } catch (error) {
-    console.error('Error al obtener el proceso:', error);
-    res.status(500).json({ mensaje: 'Error al obtener el proceso', error: error.message });
-  }
-};
-
-// Controlador para obtener todos los procesos
+// 2. Controlador para obtener todos los procesos
 export const getAllProcesos = async (req, res) => {
   try {
     // Obtener los filtros de la consulta
@@ -132,29 +101,67 @@ export const getAllProcesos = async (req, res) => {
 
     // Obtener los procesos con los filtros
     const procesos = await Proceso.find(query)
-      .populate('numeroIdentificacionCliente', 'nombre apellido')  // Poblar cliente
-      .populate('numeroIdentificacionAbogado', 'nombre apellido');  // Poblar abogado
+      .populate('numeroIdentificacionCliente', 'nombre apellido')
+      .populate('numeroIdentificacionAbogado', 'nombre apellido');
 
-    // Obtener todos los tipos de proceso
-    const tipos = await TipoProcess.find();  // Obtener todos los tipos de proceso disponibles
+    // Obtener todos los tipos de proceso, subprocesos y documentos esperados
+    const [tipos, subprocesos, documentos] = await Promise.all([
+      TipoProcess.find(),
+      SubProcess.find(),
+      DocEsp.find()
+    ]);
 
-    // Asociar el nombre del tipo de proceso con cada proceso
-    const procesosConTipo = procesos.map(proceso => {
-      const tipo = tipos.find(t => t.id_tipo === proceso.id_tipo);  // Buscar el tipo de proceso por id_tipo
+    // Asociar los nombres correspondientes a cada proceso
+    const procesosConNombres = procesos.map(proceso => {
+      const tipo = tipos.find(t => t.id_tipo === proceso.id_tipo);
+      const subproceso = subprocesos.find(s => s.id_subproceso === proceso.id_subproceso);
+      const documento = documentos.find(d => d.id_docesp === proceso.id_docesp);
+
       return {
         ...proceso.toObject(),
-        tipo: tipo ? tipo.nombre : null  // Si se encuentra, asignar el nombre del tipo, si no, null
+        tipo: tipo ? tipo.nombre : null,
+        subproceso: subproceso ? subproceso.nombre : null,
+        documento: documento ? documento.nombre : null
       };
     });
 
-    res.status(200).json(procesosConTipo);
+    res.status(200).json(procesosConNombres);
   } catch (error) {
     console.error('Error al obtener los procesos:', error);
     res.status(500).json({ mensaje: 'Error al obtener los procesos', error: error.message });
   }
 };
 
-// Controlador para actualizar un proceso por ID
+// 3. Buscar un proceso por el numero de identificacion del usuario.
+export const get_especify_process = async (req, res) => {
+  try {
+      const { numeroIdentificacionCliente } = req.params;
+      const process = await Proceso
+      .find({ numeroIdentificacionCliente })
+
+      // Si no se encuentra el usuario con el numero de identifiacion proporcionado.
+      if (!process) {
+          return res.status(404).json({
+              Request_failed: `Proceso por medio de identificacion no encontrado`
+          });
+      }
+
+      // Respuesta a la solicitud
+      res.status(200).json({
+          Request_success: ' User found successfully! asdasdas',
+          User_found: process
+      });
+  } catch (error) {
+      console.error(error)
+      res.status(500).json({
+          Request_failed: 'Error al encontrar el usuario',
+          Error: error.message
+      })
+      
+  }
+}
+
+// 4. Controlador para actualizar un proceso por ID
 export const actualizarProceso = async (req, res) => {
   try {
     const { id_proceso } = req.params;
@@ -196,7 +203,7 @@ export const actualizarProceso = async (req, res) => {
     // Verificar si el subproceso existe (si se pasa)
     let subprocesoExistente = null;
     if (id_subproceso) {
-      subprocesoExistente = await Subproceso.findOne({ id_subproceso });
+      subprocesoExistente = await SubProcess.findOne({ id_subproceso });
       if (!subprocesoExistente) {
         return res.status(404).json({ mensaje: 'Subproceso no encontrado' });
       }
@@ -231,9 +238,7 @@ export const actualizarProceso = async (req, res) => {
   }
 };
 
-
-
-// Controlador para eliminar un proceso
+// 5. Controlador para eliminar un proceso
 export const eliminarProceso = async (req, res) => {
   try {
     const { id_proceso } = req.params;
@@ -253,3 +258,33 @@ export const eliminarProceso = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar el proceso', error: error.message });
   }
 };
+
+// 6. Controlador para obtener un proceso por su Id.
+// export const get_process_id = async (req, res) => {
+//   try {
+//       const { id_proceso } = req.params;
+//       const process = await Proceso
+//       .find({ id_proceso })
+
+//       // Si no se encuentra el usuario con el numero de identifiacion proporcionado.
+//       if (!process) {
+//           return res.status(404).json({
+//               Request_failed: `Proceso con el id ${id_proceso} no encontrado`
+//           });
+//       }
+
+//       // Respuesta a la solicitud
+//       res.status(200).json({
+//           Request_success: ' Process found successfully! asdasdas',
+//           User_found: process
+//       });
+//   } catch (error) {
+//       console.error(error)
+//       res.status(500).json({
+//           Request_failed: 'Error al encontrar el proceso',
+//           Error: error.message
+//       })
+      
+//   }
+// }
+

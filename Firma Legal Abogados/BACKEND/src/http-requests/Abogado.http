@@ -6,11 +6,12 @@ Content-Type: application/json
   "especialidad": "Derecho Penal",
   "area_juridica": "Penal",
   "experiencia": "5 años en la defensa de casos penales",
-  "numeroIdentificacion": "1029144521"
+  "numeroIdentificacion": "123568978"
 }
 
 ### Obtener un abogado por ID
 GET http://localhost:9000/api/abogados/1029144521
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJudW1lcm9JZGVudGlmaWNhY2lvbiI6IjEyMzQ1Njc4OTAiLCJub21icmUiOiJBbGV4YW5kZXIiLCJhcGVsbGlkbyI6IlBlcmRvbW8gUGFycmEiLCJlbWFpbCI6ImFsZXhhbmRlci5wZXJkb21vQGdtYWlsLmNvbSIsIm5vbWJyZV9yb2wiOiJhc2lzdGVudGUiLCJpYXQiOjE3NDAwMjA3MDIsImV4cCI6MTc0MDAyNDMwMn0.YxvmJTyJn7fVfWjUKQcGD_JN983YT1SKnOudUMyvo28
 
 
 ### Actualizar un abogado

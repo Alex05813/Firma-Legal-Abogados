@@ -80,7 +80,7 @@ tipoProcessRouter.post('/', verifyToken, verifyRole(['asistente']), validatorHan
  *       500:
  *         description: Error interno en el servidor
  */
-tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerTodosTipoProcess);  // No aplica validación aquí, ya que no se necesitan parámetros
+tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente', 'abogado']), obtenerTodosTipoProcess);  // No aplica validación aquí, ya que no se necesitan parámetros
 
 
 /**
@@ -107,7 +107,7 @@ tipoProcessRouter.get('/', verifyToken, verifyRole(['asistente']), obtenerTodosT
  *       500:
  *         description: Error interno en el servidor
  */
-tipoProcessRouter.get('/:id_tipo', verifyToken, verifyRole(['asistente']), validatorHandler(getTipoProcessByIdSchema, 'params'), obtenerTipoProcessPorId);
+tipoProcessRouter.get('/:id_tipo', verifyToken, verifyRole(['asistente', 'abogado']), validatorHandler(getTipoProcessByIdSchema, 'params'), obtenerTipoProcessPorId);
 
 
 /**
