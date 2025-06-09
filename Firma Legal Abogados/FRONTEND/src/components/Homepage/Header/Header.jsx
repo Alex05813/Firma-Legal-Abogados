@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Login from '../../Login/Login'; 
 import './header.css';
+import { FaArrowDown } from 'react-icons/fa';
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -86,11 +87,11 @@ const Header = () => {
           <p>"Tu confianza, nuestro compromiso".</p>
         </div>
         <div className="Medio-homepage" id="procesos">
-          <br />
-          <a href="#procesos" className="boton-flecha">
-            <span className="flecha"></span>
-          </a>
-        </div>
+  <br />
+  <a href="#procesos" className="scroll-down-button">
+    <FaArrowDown className="scroll-down-icon" />
+  </a>
+</div>
       </div>
       <div className="Titulo-Procesos-homepage">
         <h1><br />¿EN QUE PODEMOS AYUDARTE?</h1>

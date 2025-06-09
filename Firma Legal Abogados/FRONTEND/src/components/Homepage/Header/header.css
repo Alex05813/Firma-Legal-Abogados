@@ -67,17 +67,16 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-family: 'Sans Serif';
   grid-column: 3/4;
   place-items: center;
   margin-right: 0 auto;
-  font-size: 15px;
+  font-size: 12px;
 }
 
-.nav-button-homepage:hover {
+/* .nav-button-homepage:hover {
   background-color: #cfcfdf;
   color: #fff;
-}
+} */
 
 .Imagen-Principal {
   width: 100%;
@@ -140,45 +139,36 @@ body {
   font-size: 20px;
 }
 
-.boton-flecha {
-  display: inline-block;
+/* Botón de scroll hacia abajo */
+.scroll-down-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 50px;
   height: 50px;
-  background-color: #cfcfdf;
-  border: 2px solid #cfcfdf;
+  background-color: rgba(207, 207, 223, 0.7); /* Transparencia añadida */
   border-radius: 50%;
-  text-align: center;
-  position: relative;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-  text-decoration: none;
-}
-
-.boton-flecha:hover {
-  background-color: #ffffff;
-  border-color: #cfcfdf;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  border: none;
   cursor: pointer;
+  position: relative;
+  margin: 20px auto; /* Centra el botón */
 }
 
-.flecha {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border-left: 2px solid #ffffff;
-  border-top: 2px solid #ffffff;
-  transform: rotate(-135deg);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -12px; 
-  margin-left: -10px; 
-  transition: border-color 0.3s ease;
+.scroll-down-button:hover {
+  background-color: rgba(107, 136, 179, 0.8); /* Color con transparencia al hover */
 }
 
-.boton-flecha:hover .flecha {
-  border-left: 2px solid #cfcfdf;
-  border-top: 2px solid #cfcfdf;
+.scroll-down-icon {
+  color: #ffffff;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
 }
 
+.scroll-down-button:hover .scroll-down-icon {
+  color: #ffffff;
+}
 
 .swiper {
   width: 100%;

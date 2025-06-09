@@ -8,13 +8,15 @@ import "./navbar.css";
 const Navbar = () => {
   const { logout, isAuthenticated, role } = useContext(AuthContext);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [rutas, setRutas] = useState([]); // Estado para almacenar rutas permitidas
+  const [rutas, setRutas] = useState([]);
   const navigate = useNavigate();
 
-  // Actualiza las rutas permitidas cuando cambia la autenticación o el rol
   useEffect(() => {
-    const rutasActualizadas = obtenerRutasPermitidas(isAuthenticated, role);
-    setRutas(rutasActualizadas || []); // Asegurarse de que siempre sea un array
+    // Obtener las rutas permitidas cuando cambia la autenticación o el rol    
+    if (isAuthenticated && role) {
+      const rutasActualizadas = obtenerRutasPermitidas(isAuthenticated, role);
+      setRutas(rutasActualizadas);
+    }
   }, [isAuthenticated, role]);
 
   const toggleMenu = () => {
@@ -24,21 +26,16 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setMenuVisible(false);
-    navigate("/homepage");
+    navigate("/homepage"); // Redirige al homepage después del logout
   };
 
   const handleLinkClick = () => {
     setMenuVisible(false);
   };
 
-  // Renderizar los enlaces del menú basado en las rutas permitidas
   const renderLinks = () =>
     rutas.map((ruta) => (
-      <Link
-        to={normalizeText(ruta.ruta)}
-        key={ruta.nombre}
-        onClick={handleLinkClick}
-      >
+      <Link to={normalizeText(ruta.ruta)} key={ruta.nombre} onClick={handleLinkClick}>
         {ruta.nombre}
       </Link>
     ));
@@ -50,26 +47,11 @@ const Navbar = () => {
           L<span className="P2">&</span>O
         </h1>
         <div className="navegacion">
-          <button className="hamburger-button" onClick={toggleMenu}>
-            ☰
-          </button>
-          {menuVisible && (
-            <nav className="dropdown-menu">
-              {isAuthenticated ? (
-                <>
-                  {renderLinks()}
-                  <button onClick={handleLogout}>Cerrar Sesión</button>
-                </>
-              ) : (
-                <Link to="/homepage" onClick={handleLinkClick}>
-                  Iniciar Sesión
-                </Link>
-              )}
-            </nav>
-          )}
+   
+            <button onClick={handleLogout} className="btnlogin-homepage">Cerrar Sesión</button>
+            
         </div>
       </header>
-
       <div className="opciones">
         <div className="opciones-container">
           <center>{renderLinks()}</center>

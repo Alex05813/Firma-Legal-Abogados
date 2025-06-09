@@ -4,6 +4,7 @@ import { AuthContext } from './contexts/AuthContext.jsx'; // Solo se consume el 
 import Navbar from './components/Navbar/Navbar.jsx';
 import Homepage from './pages/Home/Homepage.jsx';
 import NavBarRoutes from './components/routes/NavBarRoutes.jsx';
+import CaseDetails from './components/Homepage/CaseDetails/CaseDetails.jsx';
 
 const App = () => {
   const { isAuthenticated } = useContext(AuthContext); // Obtén el estado global
@@ -14,9 +15,11 @@ const App = () => {
       {isAuthenticated && <Navbar />}
 
       <Routes>
+        
+      
         {/* Ruta accesible para todos */}
         <Route path="/" element={<Homepage />} />
-
+        <Route path="/casos/:caseType" element={<CaseDetails />} /> {/* Mover aquí */}
         {/* Rutas protegidas */}
         <Route
           path="/*"
@@ -24,6 +27,7 @@ const App = () => {
         />
       </Routes>
     </Router>
+    
   );
 };
 

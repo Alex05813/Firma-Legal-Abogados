@@ -3,12 +3,14 @@ import axios from "axios";
 import { Spinner, Button, Table, Form, Card } from "react-bootstrap";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext.jsx";
-import Notification from "../../components/Notification/Notification.jsx";
-import Delete from "../../components/Delete/Delete.jsx";
-import "../../style/tableStyle.css";
+import { AuthContext } from "../../../contexts/AuthContext.jsx";
+import Notification from "../../../components/Notification/Notification.jsx";
+import Delete from "../../../components/Delete/Delete.jsx";
+import "../../../style/tableStyle.css";
 
 function Proceso() {
+  const { isAuthenticated, role } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [process, setProcess] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,16 +28,12 @@ function Proceso() {
   const [tipos, setTipos] = useState([]);
   const [subprocesos, setSubprocesos] = useState([]);
   const [documentos, setDocumentos] = useState([]);
-  const [alert, setAlert] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [processToDelete, setProcessToDelete] = useState(null);
-
-  const { isAuthenticated, role } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -47,17 +45,17 @@ function Proceso() {
       const token = localStorage.getItem("token");
 
       try {
-        const [procesosResponse, tiposResponse] = await Promise.all([
-          axios.get("http://localhost:9000/api/procesos", {
-            headers: { Authorization: token },
-          }),
-          axios.get("http://localhost:9000/api/tipoprocesos", {
-            headers: { Authorization: token },
-          }),
+        const [procesosResponse, tiposResponse, subprocesosResponse, documentosResponse] = await Promise.all([
+          axios.get("http://localhost:9000/api/procesos", { headers: { Authorization: token } }),
+          axios.get("http://localhost:9000/api/tipoprocesos", { headers: { Authorization: token } }),
+          axios.get("http://localhost:9000/api/subprocesos", { headers: { Authorization: token } }),
+          axios.get("http://localhost:9000/api/docesp", { headers: { Authorization: token } }),
         ]);
 
         setProcess(procesosResponse.data);
         setTipos(tiposResponse.data);
+        setSubprocesos(subprocesosResponse.data);
+        setDocumentos(documentosResponse.data);
       } catch (err) {
         setError("Error al cargar los datos");
         console.error("Error:", err);
@@ -76,8 +74,6 @@ function Proceso() {
 
   const handleTipoChange = async (e) => {
     const { value } = e.target;
-
-    // Reset subproceso and documento when type changes
     setNewProcess({ ...newProcess, id_tipo: value, id_subproceso: "", id_documento: "" });
 
     if (value) {
@@ -85,9 +81,7 @@ function Proceso() {
         const token = localStorage.getItem("token");
         const response = await axios.get(
           `http://localhost:9000/api/subprocesos/tipo/${value}`,
-          {
-            headers: { Authorization: token },
-          }
+          { headers: { Authorization: token } }
         );
         setSubprocesos(response.data);
       } catch (err) {
@@ -123,37 +117,31 @@ function Proceso() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-  
-    // Filtrar los campos vacíos
+
     const processData = { ...newProcess };
-  
-    if (!processData.id_subproceso) {
-      delete processData.id_subproceso;
-    }
-    if (!processData.id_documento) {
-      delete processData.id_documento;
-    }
-  
+
+    if (!processData.id_subproceso) delete processData.id_subproceso;
+    if (!processData.id_documento) delete processData.id_documento;
+
     try {
       const apiCall = isEditing
         ? axios.put(
-            `http://localhost:9000/api/procesos/${newProcess.id_proceso}`,
-            processData,
-            { headers: { Authorization: token } }
-          )
+          `http://localhost:9000/api/procesos/${newProcess.id_proceso}`,
+          processData,
+          { headers: { Authorization: token } }
+        )
         : axios.post(
-            "http://localhost:9000/api/procesos",
-            processData,
-            { headers: { Authorization: token } }
-          );
-  
+          "http://localhost:9000/api/procesos",
+          processData,
+          { headers: { Authorization: token } }
+        );
+
       await apiCall;
-  
+
       setToastMessage(isEditing ? "Proceso actualizado con éxito" : "Proceso creado con éxito");
       setToastType("success");
       setShowToast(true);
-  
-      // Reset form
+
       setNewProcess({
         id_proceso: "",
         descripcion: "",
@@ -165,7 +153,7 @@ function Proceso() {
         id_subproceso: "",
         id_documento: "",
       });
-  
+
       const response = await axios.get("http://localhost:9000/api/procesos", {
         headers: { Authorization: token },
       });
@@ -178,8 +166,6 @@ function Proceso() {
       setShowToast(true);
     }
   };
-  
-  
 
   const handleDelete = (process) => {
     setProcessToDelete(process);
@@ -259,15 +245,14 @@ function Proceso() {
             </Card.Header>
             <Card.Body>
               <Form onSubmit={handleSubmit}>
-                {/* Campos del formulario */}
                 <Form.Group controlId="id_proceso" className="mb-3">
-                  <Form.Label>Id del proceso</Form.Label>
+                  <Form.Label>ID del Proceso</Form.Label>
                   <Form.Control
                     type="number"
                     name="id_proceso"
                     value={newProcess.id_proceso}
                     onChange={handleChange}
-                    placeholder="Ingrese el id del proceso"
+                    placeholder="Ingrese el ID del proceso"
                     required
                     disabled={isEditing}
                     className="line-input"
@@ -275,13 +260,13 @@ function Proceso() {
                 </Form.Group>
 
                 <Form.Group controlId="descripcion" className="mb-3">
-                  <Form.Label>Descripcion</Form.Label>
+                  <Form.Label>Descripción</Form.Label>
                   <Form.Control
-                    type="string"
+                    type="text"
                     name="descripcion"
                     value={newProcess.descripcion}
                     onChange={handleChange}
-                    placeholder="Ingrese la descripcion del proceso"
+                    placeholder="Ingrese la descripción"
                     required
                     className="line-input"
                   />
@@ -316,35 +301,33 @@ function Proceso() {
                 </Form.Group>
 
                 <Form.Group controlId="numeroIdentificacionCliente" className="mb-3">
-                  <Form.Label>Número de Identificación Cliente</Form.Label>
+                  <Form.Label>Identificación Cliente</Form.Label>
                   <Form.Control
                     type="text"
                     name="numeroIdentificacionCliente"
                     value={newProcess.numeroIdentificacionCliente}
                     onChange={handleChange}
+                    placeholder="Identificación del cliente"
                     required
                     className="line-input"
                   />
                 </Form.Group>
 
                 <Form.Group controlId="numeroIdentificacionAbogado" className="mb-3">
-                  <Form.Label>Número de Identificación Abogado</Form.Label>
+                  <Form.Label>Identificación Abogado</Form.Label>
                   <Form.Control
                     type="text"
                     name="numeroIdentificacionAbogado"
                     value={newProcess.numeroIdentificacionAbogado}
                     onChange={handleChange}
+                    placeholder="Identificación del abogado"
                     required
                     className="line-input"
                   />
                 </Form.Group>
 
-
-
-                {/* Campos relacionados con Tipo, Subproceso y Documento */}
-
                 <Form.Group controlId="id_tipo" className="mb-3">
-                  <Form.Label>Tipo</Form.Label>
+                  <Form.Label>Tipo de Proceso</Form.Label>
                   <Form.Control
                     as="select"
                     name="id_tipo"
@@ -354,8 +337,8 @@ function Proceso() {
                     className="line-input"
                   >
                     <option value="">Seleccione un tipo</option>
-                    {tipos.map((tipo, index) => (
-                      <option key={`${tipo.id_tipo}-${index}`} value={tipo.id_tipo}>
+                    {tipos.map((tipo) => (
+                      <option key={tipo.id_tipo} value={tipo.id_tipo}>
                         {tipo.nombre}
                       </option>
                     ))}
@@ -373,8 +356,8 @@ function Proceso() {
                     className="line-input"
                   >
                     <option value="">Seleccione un subproceso</option>
-                    {subprocesos.map((subproceso, index) => (
-                      <option key={`${subproceso.id_subproceso}-${index}`} value={subproceso.id_subproceso}>
+                    {subprocesos.map((subproceso) => (
+                      <option key={subproceso.id_subproceso} value={subproceso.id_subproceso}>
                         {subproceso.nombre}
                       </option>
                     ))}
@@ -392,16 +375,15 @@ function Proceso() {
                     className="line-input"
                   >
                     <option value="">Seleccione un documento</option>
-                    {documentos.map((documento, index) => (
-                      <option key={`${documento.id_documento}-${index}`} value={documento.id_documento}>
+                    {documentos.map((documento) => (
+                      <option key={documento.id_documento} value={documento.id_documento}>
                         {documento.nombre}
                       </option>
                     ))}
                   </Form.Control>
                 </Form.Group>
 
-
-                <Button variant="primary" type="submit" className="mt-2" block="true">
+                <Button variant="primary" type="submit" className="w-100">
                   {isEditing ? "Actualizar Proceso" : "Registrar Proceso"}
                 </Button>
               </Form>
@@ -410,55 +392,59 @@ function Proceso() {
         </div>
 
         <div className="col-md-8">
-          <Table striped bordered hover responsive className="mt-4">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Descripción</th>
-      <th>Fecha de Inicio</th>
-      <th>Estado</th>
-      <th>Cliente</th>
-      <th>Abogado</th>
-      <th>Tipo</th>
-      <th>Subproceso</th>
-      <th>Documento</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {process.map((proc) => (
-      <tr key={proc.id_proceso}>
-        <td>{proc.id_proceso}</td>
-        <td>{proc.descripcion}</td>
-        <td>{proc.fecha_inicio}</td>
-        <td>{proc.estado}</td>
-        <td>{proc.numeroIdentificacionCliente}</td>
-        <td>{proc.numeroIdentificacionAbogado}</td>
-        <td>{tipos.find((tipo) => tipo.id_tipo === proc.id_tipo)?.nombre || "N/A"}</td>
-        <td>{subprocesos.find((subproceso) => subproceso.id_subproceso === proc.id_subproceso)?.nombre || "N/A"}</td>
-        <td>{documentos.find((documento) => documento.id_documento === proc.id_documento)?.nombre || "N/A"}</td>
-        <td>
-          <Button
-            variant="warning"
-            size="sm"
-            className="me-2"
-            onClick={() => handleEdit(proc)}
-          >
-            <BsFillPencilFill />
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(proc)}
-          >
-            <BsFillTrashFill />
-          </Button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
+          <Card className="table-card">
+            <Card.Body>
+              <div className="table-container">
+                <Table responsive striped hover>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Descripción</th>
+                      <th>Fecha Inicio</th>
+                      <th>Estado</th>
+                      <th>Cliente</th>
+                      <th>Abogado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {process.map((proc) => {
+                      const tipoNombre = tipos.find(t => t.id_tipo === proc.id_tipo)?.nombre || "N/A";
+                      const subprocesoNombre = subprocesos.find(sp => sp.id_subproceso === proc.id_subproceso)?.nombre || "N/A";
+                      const documentoNombre = documentos.find(doc => doc.id_documento === proc.id_documento)?.nombre || "N/A";
 
+                      return (
+                        <tr key={proc.id_proceso}>
+                          <td>{proc.id_proceso}</td>
+                          <td className="description">{proc.descripcion}</td>
+                          <td>{proc.fecha_inicio}</td>
+                          <td>{proc.estado}</td>
+                          <td>{proc.numeroIdentificacionCliente}</td>
+                          <td>{proc.numeroIdentificacionAbogado}</td>
+
+                          <td>
+                            <Button
+                              variant="info"
+                              onClick={() => handleEdit(proc)}
+                              className="me-2"
+                            >
+                              <BsFillPencilFill />
+                            </Button>
+                            <Button
+                              variant="danger"
+                              onClick={() => handleDelete(proc)}
+                            >
+                              <BsFillTrashFill />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
     </div>

@@ -3,24 +3,23 @@ import axios from "axios";
 import { Spinner, Button, Table, Form, Card } from "react-bootstrap";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext.jsx"; // Asegúrate de tener el contexto de autenticación
-import Notification from "../../components/Notification/Notification.jsx";
-import Delete from "../../components/Delete/Delete.jsx"; // Componente para confirmar eliminación
-import "../../style/tableStyle.css";
+import { AuthContext } from "../../../contexts/AuthContext.jsx"; // Asegúrate de tener el contexto de autenticación
+import Notification from "../../../components/Notification/Notification.jsx";
+import Delete from "../../../components/Delete/Delete.jsx"; // Componente para confirmar eliminación
+import "../../../style/tableStyle.css";
 
-function Factura() {
+function Agenda() {
   const { isAuthenticated } = useContext(AuthContext); // Para verificar si está autenticado
   const navigate = useNavigate();
-  const [facturas, setFacturas] = useState([]);
+  const [agendas, setAgendas] = useState([]);
   const [procesos, setProcesos] = useState([]);  // Lista de procesos
-  const [newFactura, setNewFactura] = useState({
-    id_factura: '',
-    monto: '',
-    fecha_emision: '',
-    fecha_vencimiento: '',
+  const [newAgenda, setNewAgenda] = useState({
+    id_agenda: '',
+    fecha: '',
+    hora: '',
+    descripcion: '',
     estado: '',
-    metodo_pago: '',
-    id_proceso: '', // Asegúrate de tener este campo en el estado de la factura
+    id_proceso: '', // Asegúrate de tener este campo en el estado de la agenda
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,7 +32,7 @@ function Factura() {
 
   // Modal de confirmación de eliminación
   const [showModal, setShowModal] = useState(false);
-  const [facturaToDelete, setFacturaToDelete] = useState(null);
+  const [agendaToDelete, setAgendaToDelete] = useState(null);
 
   // Verificar autenticación al cargar
   useEffect(() => {
@@ -45,11 +44,11 @@ function Factura() {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       try {
-        // Obtener las facturas
-        const response = await axios.get("http://localhost:9000/api/facturas", {
+        // Obtener las agendas
+        const response = await axios.get("http://localhost:9000/api/agendas", {
           headers: { Authorization: token },
         });
-        setFacturas(response.data);
+        setAgendas(response.data);
 
         // Obtener los procesos
         const procesosResponse = await axios.get("http://localhost:9000/api/procesos", {
@@ -58,7 +57,7 @@ function Factura() {
         setProcesos(procesosResponse.data);
 
       } catch (err) {
-        setError("Error al cargar las facturas o procesos");
+        setError("Error al cargar las agendas o procesos");
         console.error("Error:", err);
       } finally {
         setLoading(false);
@@ -71,111 +70,113 @@ function Factura() {
   // Manejo del cambio de campos en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewFactura({ ...newFactura, [name]: value });
+    setNewAgenda({ ...newAgenda, [name]: value });
   };
 
-  // Manejo del envío del formulario (crear o actualizar factura)
-  const handleFacturaSubmit = async (e) => {
+  // Manejo del envío del formulario (crear o actualizar agenda)
+  const handleAgendaSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
+  
     // Validar que los campos requeridos no estén vacíos
-    if (!newFactura.id_proceso || !newFactura.monto || !newFactura.fecha_emision || !newFactura.fecha_vencimiento || !newFactura.estado || !newFactura.metodo_pago) {
+    if (!newAgenda.id_agenda || !newAgenda.fecha || !newAgenda.hora || !newAgenda.descripcion || !newAgenda.estado || !newAgenda.id_proceso) {
       setToastMessage('Todos los campos son obligatorios');
       setToastType('danger');
       setShowToast(true);
       return;
     }
-
+  
     try {
       let response;
+      const { id_agenda, ...agendaData } = newAgenda;
+  
+      // Si estamos editando, eliminamos `id_proceso` antes de enviar la solicitud PUT
       if (isEditing) {
-        // Si estamos editando, enviamos una solicitud PUT para actualizar
-        const { id_factura, ...facturaData } = newFactura; // Remover id_factura del cuerpo
-        response = await axios.put(`http://localhost:9000/api/facturas/${id_factura}`, facturaData, {
+        delete agendaData.id_proceso;  // Elimina el campo `id_proceso` al actualizar
+  
+        response = await axios.put(`http://localhost:9000/api/agendas/${id_agenda}`, agendaData, {
           headers: { Authorization: token },
         });
-        setToastMessage('Factura actualizada con éxito');
+        setToastMessage('Agenda actualizada con éxito');
       } else {
         // Si estamos creando, enviamos una solicitud POST
-        response = await axios.post('http://localhost:9000/api/facturas', newFactura, {
+        response = await axios.post('http://localhost:9000/api/agendas', newAgenda, {
           headers: { Authorization: token },
         });
-        setToastMessage('Factura creada con éxito');
+        setToastMessage('Agenda creada con éxito');
       }
-
+  
       setToastType('success');
       setShowToast(true);
-
+  
       // Resetear formulario
-      setNewFactura({
-        id_factura: '',
-        monto: '',
-        fecha_emision: '',
-        fecha_vencimiento: '',
+      setNewAgenda({
+        id_agenda: '',
+        fecha: '',
+        hora: '',
+        descripcion: '',
         estado: '',
-        metodo_pago: '',
         id_proceso: '',
       });
-
-      // Recargar la lista de facturas
-      const fetchData = await axios.get("http://localhost:9000/api/facturas", {
+  
+      // Recargar la lista de agendas
+      const fetchData = await axios.get("http://localhost:9000/api/agendas", {
         headers: { Authorization: token },
       });
-      setFacturas(fetchData.data);
-
+      setAgendas(fetchData.data);
+  
       // Cambiar el modo de edición a falso después de guardar
       setIsEditing(false);
     } catch (err) {
-      console.error('Error al guardar factura:', err.response?.data || err.message);
-      setToastMessage('Error al guardar factura');
+      console.error('Error al guardar agenda:', err.response?.data || err.message);
+      setToastMessage('Error al guardar agenda');
       setToastType('danger');
       setShowToast(true);
     }
   };
+  
 
-  // Función que maneja el clic en el botón de editar y carga los datos de la factura en el formulario
-  const handleEdit = (factura) => {
+  // Función que maneja el clic en el botón de editar y carga los datos de la agenda en el formulario
+  const handleEdit = (agenda) => {
     setIsEditing(true);
-    setNewFactura({
-      id_factura: factura.id_factura,
-      monto: factura.monto,
-      fecha_emision: factura.fecha_emision,
-      fecha_vencimiento: factura.fecha_vencimiento,
-      estado: factura.estado,
-      metodo_pago: factura.metodo_pago,
-      id_proceso: factura.id_proceso,
+    setNewAgenda({
+      id_agenda: agenda.id_agenda,
+      fecha: agenda.fecha,
+      hora: agenda.hora,
+      descripcion: agenda.descripcion,
+      estado: agenda.estado,
+      id_proceso: agenda.id_proceso,
     });
   };
 
   // Función para iniciar el proceso de eliminación
-  const handleDelete = (factura) => {
-    setFacturaToDelete(factura);
+  const handleDelete = (agenda) => {
+    setAgendaToDelete(agenda);
     setShowModal(true);
   };
 
-  // Confirmar eliminación de la factura
+  // Confirmar eliminación de la agenda
   const confirmDelete = async () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(`http://localhost:9000/api/facturas/${facturaToDelete.id_factura}`, {
+      await axios.delete(`http://localhost:9000/api/agendas/${agendaToDelete.id_agenda}`, {
         headers: { Authorization: token },
       });
 
-      setToastMessage("Factura eliminada con éxito");
+      setToastMessage("Agenda eliminada con éxito");
       setToastType("success");
       setShowToast(true);
 
-      // Actualizar la lista de facturas después de la eliminación
-      const response = await axios.get("http://localhost:9000/api/facturas", {
+      // Actualizar la lista de agendas después de la eliminación
+      const response = await axios.get("http://localhost:9000/api/agendas", {
         headers: { Authorization: token },
       });
-      setFacturas(response.data);
+      setAgendas(response.data);
 
       setShowModal(false);
     } catch (err) {
-      setToastMessage("Error al eliminar la factura");
+      setToastMessage("Error al eliminar la agenda");
       setToastType("danger");
       setShowToast(true);
       setShowModal(false);
@@ -216,58 +217,58 @@ function Factura() {
         <div className="col-md-4">
           <Card className="form-card">
             <Card.Header as="h5" className="text-center">
-              {isEditing ? "Actualizar Factura" : "Registrar Factura"}
+              {isEditing ? "Actualizar Agenda" : "Registrar Agenda"}
             </Card.Header>
             <Card.Body>
-              <Form onSubmit={handleFacturaSubmit}>
-                {/* El campo de id_factura no se muestra cuando estamos en modo edición */}
+              <Form onSubmit={handleAgendaSubmit}>
+                {/* El campo de id_agenda no se muestra cuando estamos en modo edición */}
                 {!isEditing && (
-                  <Form.Group controlId="id_factura" className="mb-3">
-                    <Form.Label>Id Factura</Form.Label>
+                  <Form.Group controlId="id_agenda" className="mb-3">
+                    <Form.Label>Id Agenda</Form.Label>
                     <Form.Control
                       type="number"
-                      name="id_factura"
-                      value={newFactura.id_factura || 0}  // Si es undefined o null, asigna 0
+                      name="id_agenda"
+                      value={newAgenda.id_agenda || 0}  // Si es undefined o null, asigna 0
                       onChange={handleChange}
-                      placeholder="Ingrese el ID de la factura"
+                      placeholder="Ingrese el ID de la agenda"
                       required
                       className="line-input"
                     />
                   </Form.Group>
                 )}
 
-                <Form.Group controlId="monto" className="mb-3">
-                  <Form.Label>Monto</Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="monto"
-                    value={newFactura.monto}
-                    onChange={handleChange}
-                    placeholder="Ingrese el monto"
-                    required
-                    className="line-input"
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="fecha_emision" className="mb-3">
-                  <Form.Label>Fecha de Emisión</Form.Label>
+                <Form.Group controlId="fecha" className="mb-3">
+                  <Form.Label>Fecha</Form.Label>
                   <Form.Control
                     type="date"
-                    name="fecha_emision"
-                    value={newFactura.fecha_emision}
+                    name="fecha"
+                    value={newAgenda.fecha}
                     onChange={handleChange}
                     required
                     className="line-input"
                   />
                 </Form.Group>
 
-                <Form.Group controlId="fecha_vencimiento" className="mb-3">
-                  <Form.Label>Fecha de Vencimiento</Form.Label>
+                <Form.Group controlId="hora" className="mb-3">
+                  <Form.Label>Hora</Form.Label>
                   <Form.Control
-                    type="date"
-                    name="fecha_vencimiento"
-                    value={newFactura.fecha_vencimiento}
+                    type="time"  // Asegúrate de que el tipo sea "time"
+                    name="hora"
+                    value={newAgenda.hora}
                     onChange={handleChange}
+                    required
+                    className="line-input"
+                  />
+                </Form.Group>
+
+                <Form.Group controlId="descripcion" className="mb-3">
+                  <Form.Label>Descripción</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="descripcion"
+                    value={newAgenda.descripcion}
+                    onChange={handleChange}
+                    placeholder="Ingrese la descripción"
                     required
                     className="line-input"
                   />
@@ -278,30 +279,13 @@ function Factura() {
                   <Form.Control
                     as="select"
                     name="estado"
-                    value={newFactura.estado}
+                    value={newAgenda.estado}
                     onChange={handleChange}
                     required
                     className="line-input"
                   >
+                    <option value="programada">Programada</option>
                     <option value="cancelada">Cancelada</option>
-                    <option value="sin cancelar">Sin cancelar</option>
-                  </Form.Control>
-                </Form.Group>
-
-
-                <Form.Group controlId="metodo_pago" className="mb-3">
-                  <Form.Label>Método de Pago</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="metodo_pago"
-                    value={newFactura.metodo_pago}
-                    onChange={handleChange}
-                    required
-                    className="line-input"
-                  >
-                    <option value="efectivo">Efectivo</option>
-                    <option value="credito">Credito</option>
-                    <option value="transferencia">Transferencia</option>
                   </Form.Control>
                 </Form.Group>
 
@@ -311,7 +295,7 @@ function Factura() {
                   <Form.Control
                     as="select"
                     name="id_proceso"
-                    value={newFactura.id_proceso}
+                    value={newAgenda.id_proceso}
                     onChange={handleChange}
                     required
                     className="line-input"
@@ -326,7 +310,7 @@ function Factura() {
                 </Form.Group>
 
                 <Button variant="primary" type="submit" block="true">
-                  {isEditing ? "Actualizar Factura" : "Crear Factura"}
+                  {isEditing ? "Actualizar Agenda" : "Crear Agenda"}
                 </Button>
               </Form>
             </Card.Body>
@@ -339,37 +323,35 @@ function Factura() {
               <Table responsive striped hover>
                 <thead>
                   <tr>
-                    <th>ID Factura</th>
-                    <th>Monto</th>
-                    <th>Fecha Emisión</th>
-                    <th>Fecha Vencimiento</th>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Descripción</th>
                     <th>Estado</th>
-                    <th>Método de Pago</th>
                     <th>Proceso</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {facturas.map((factura) => (
-                    <tr key={factura.id_factura}>
-                      <td>{factura.id_factura}</td>
-                      <td>{factura.monto}</td>
-                      <td>{factura.fecha_emision}</td>
-                      <td>{factura.fecha_vencimiento}</td>
-                      <td>{factura.estado}</td>
-                      <td>{factura.metodo_pago}</td>
-                      <td>{factura.id_proceso}</td>
+                  {agendas.map((agenda) => (
+                    <tr key={agenda.id_agenda}>
+                      <td>{agenda.id_agenda}</td>
+                      <td>{agenda.fecha}</td>
+                      <td>{agenda.hora}</td>
+                      <td>{agenda.descripcion}</td>
+                      <td>{agenda.estado}</td>
+                      <td>{agenda.id_proceso}</td>
                       <td>
                         <Button
                           variant="info"
-                          onClick={() => handleEdit(factura)} // Establece el modo de edición
+                          onClick={() => handleEdit(agenda)} // Establece el modo de edición
                           className="me-2"
                         >
                           <BsFillPencilFill />
                         </Button>
                         <Button
                           variant="danger"
-                          onClick={() => handleDelete(factura)} // Elimina la factura
+                          onClick={() => handleDelete(agenda)} // Elimina la agenda
                           className="me-2"
                         >
                           <BsFillTrashFill />
@@ -387,4 +369,4 @@ function Factura() {
   );
 }
 
-export default Factura;
+export default Agenda;

@@ -3,9 +3,9 @@ import axios from "axios";
 import { Spinner, Button, Table, Form, Card } from "react-bootstrap";
 import { BsFillPencilFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext.jsx"; // Asegúrate de tener el contexto de autenticación
-import Notification from "../../components/Notification/Notification.jsx"; // Importa el componente de notificación
-import "../../style/tableStyle.css";
+import { AuthContext } from "../../../contexts/AuthContext.jsx"; // Asegúrate de tener el contexto de autenticación
+import Notification from "../../../components/Notification/Notification.jsx"; // Importa el componente de notificación
+import "../../../style/tableStyle.css";
 
 function Cliente() {
   const { isAuthenticated } = useContext(AuthContext); // Para verificar si está autenticado
@@ -221,7 +221,7 @@ function Cliente() {
               <Table responsive striped hover>
                 <thead>
                   <tr>
-                    <th>Número de Identificación</th>
+                    <th>Identificación</th>
                     <th>Dirección</th>
                     <th>Estado</th>
                     <th>Estado Cliente</th>

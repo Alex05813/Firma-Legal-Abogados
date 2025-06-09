@@ -2,38 +2,39 @@ const obtenerRutasPermitidas = (isAuthenticated, role) => {
     // Asegúrate de que el rol no sea undefined o null
     role = role ?? "";
 
-    // Definir las rutas para el rol "Asistente"
+    // Rutas para usuarios con rol "Asistente"
     const rutasAsistente = [
-        { nombre: "Agenda", ruta: "/agenda", roles: ["Asistente"] },
-        { nombre: "Proceso", ruta: "/proceso", roles: ["Asistente"] },
-        { nombre: "Facturas", ruta: "/factura", roles: ["Asistente"] },
-        { nombre: "Cliente", ruta: "/cliente", roles: ["Asistente"] },
-        { nombre: "Usuario", ruta: "/usuario", roles: ["Asistente"] },
+        { nombre: "Home", ruta: "/page-principal", roles: ["asistente"] },
+        { nombre: "Usuario", ruta: "/usuario", roles: ["asistente"] },
+        { nombre: "Cliente", ruta: "/cliente", roles: ["asistente"] },
+        { nombre: "Proceso", ruta: "/proceso", roles: ["asistente"] },
+        { nombre: "Agenda", ruta: "/agenda", roles: ["asistente"] },
+        { nombre: "Facturas", ruta: "/facturas", roles: ["asistente"] },
     ];
 
-    // Definir las rutas para el rol "Abogado"
+    // Rutas para usuarios con rol "Abogado"
     const rutasAbogado = [
-        { nombre: "Abogado", ruta: "/abogado", roles: ["Abogado"] },
+       
     ];
 
-    // Definir las rutas para el rol "Cliente"
+    // Rutas para usuarios con rol "Cliente"
     const rutasUsuario = [
-        { nombre: "Usuario", ruta: "/usuario", roles: ["Cliente"] },
+        
+
     ];
 
     // Combina las rutas basadas en el rol del usuario
     let rutasPermitidas = [];
 
     if (isAuthenticated) {
-        if (role === "Asistente") {
+        if (role === "asistente") {
             rutasPermitidas = rutasAsistente;
-        } else if (role === "Abogado") {
+        } else if (role === "abogado") {
             rutasPermitidas = rutasAbogado;
-        } else if (role === "Cliente") {
+        } else if (role === "cliente") {
             rutasPermitidas = rutasUsuario;
         }
-    }
-
+    }    
     return rutasPermitidas;
 };
 
